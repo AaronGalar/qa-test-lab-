@@ -183,7 +183,7 @@ test("TC-004 - Crear caso de prueba", async ({ page }, testInfo) => {
     });
 
     await metrics.recordStep("Seleccionar prioridad", async () => {
-      const priority = page.getByLabel("Prioridad");
+      const priority = page.getByRole("button", { name: "Prioridad" });
       await clickLikeUser(priority);
       const priorityOptions = page.getByRole("listbox", {
         name: "Niveles de prioridad",
@@ -191,7 +191,9 @@ test("TC-004 - Crear caso de prueba", async ({ page }, testInfo) => {
       await expect(priorityOptions).toBeVisible();
       await expect(priorityOptions.getByRole("option")).toHaveCount(3);
       await page.waitForTimeout(1100);
-      await clickLikeUser(page.getByRole("option", { name: /Alta/ }));
+      await clickLikeUser(
+        priorityOptions.getByRole("option", { name: /^Alta/ }),
+      );
       await expect(priority).toContainText("Alta");
     });
 
