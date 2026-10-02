@@ -19,6 +19,8 @@
 
 # production
 /build
+/dashboard-debug.png
+/output/*.remotion-in-progress
 
 # misc
 .DS_Store
@@ -39,3 +41,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

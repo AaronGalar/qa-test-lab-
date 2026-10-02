@@ -16,6 +16,21 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## QA video guides
+
+- [Guia practica para crear videos QA](docs/GUIA-CREAR-VIDEOS-QA.md)
+- [Playbook para que una IA cree videos QA](docs/PLAYBOOK-IA-VIDEOS-QA.md)
+
+### Tutorial real de primer uso
+
+```bash
+npm run render:tutorial
+```
+
+El comando usa Playwright para grabar el recorrido real por login, asistente IA y creacion de un caso. Despues Remotion monta esa captura con instrucciones sincronizadas. La fuente WebM queda en `public/recordings/tutorial-ia.webm` y el MP4 final en `output/Tutorial-primer-uso.mp4`.
+
+Para volver a grabar solo la interaccion, ejecuta `npm run record:tutorial`.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

@@ -1,0 +1,64 @@
+{
+  "id": "TC-004",
+  "title": "Crear caso de prueba",
+  "status": "PASSED",
+  "startedAt": 1790581553170,
+  "durationMs": 43148,
+  "steps": [
+    {
+      "name": "Abrir login",
+      "status": "PASSED",
+      "startMs": 3,
+      "endMs": 2195
+    },
+    {
+      "name": "Introducir credenciales",
+      "status": "PASSED",
+      "startMs": 2195,
+      "endMs": 8334
+    },
+    {
+      "name": "Iniciar sesión",
+      "status": "PASSED",
+      "startMs": 8334,
+      "endMs": 11190
+    },
+    {
+      "name": "Abrir Test Cases",
+      "status": "PASSED",
+      "startMs": 11190,
+      "endMs": 14008
+    },
+    {
+      "name": "Abrir formulario",
+      "status": "PASSED",
+      "startMs": 14008,
+      "endMs": 16690
+    },
+    {
+      "name": "Completar caso",
+      "status": "PASSED",
+      "startMs": 16690,
+      "endMs": 32643
+    },
+    {
+      "name": "Seleccionar prioridad",
+      "status": "PASSED",
+      "startMs": 32643,
+      "endMs": 37827
+    },
+    {
+      "name": "Guardar caso",
+      "status": "PASSED",
+      "startMs": 37827,
+      "endMs": 43148
+    }
+  ],
+  "createdCase": {
+    "id": "TC-004",
+    "title": "Crear usuario",
+    "description": "Comprobar que un usuario puede crearse correctamente",
+    "priority": "High",
+    "status": "PENDING"
+  }
+}

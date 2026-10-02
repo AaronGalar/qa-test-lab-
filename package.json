@@ -6,14 +6,24 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "remotion": "remotion studio remotion/index.ts",
+    "render:ai-demo": "node scripts/render-ai-demo.mjs",
+    "record:tutorial": "playwright test tests/real-first-use-tour.spec.ts --project=chromium --workers=1 --reporter=line",
+    "render:tutorial": "node scripts/render-real-tutorial.mjs",
+    "render:qa": "node scripts/render-tc004.mjs",
+    "render:test": "node scripts/render-tc004.mjs"
   },
   "dependencies": {
+    "@remotion/cli": "^4.0.528",
     "next": "16.3.6",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "remotion": "^4.0.528",
+    "zod": "4.5.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

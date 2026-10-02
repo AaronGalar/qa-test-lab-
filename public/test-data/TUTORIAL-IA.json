@@ -1,0 +1,88 @@
+{
+  "id": "TUTORIAL-IA",
+  "title": "Primer uso de QA Test Lab y el asistente de IA",
+  "status": "PASSED",
+  "startedAt": 1790854951348,
+  "durationMs": 47678,
+  "steps": [
+    {
+      "name": "Abrir la pantalla de inicio de sesión",
+      "status": "PASSED",
+      "startMs": 6,
+      "endMs": 1370
+    },
+    {
+      "name": "Introducir las credenciales de demostración",
+      "status": "PASSED",
+      "startMs": 1370,
+      "endMs": 5541
+    },
+    {
+      "name": "Iniciar sesión",
+      "status": "PASSED",
+      "startMs": 5541,
+      "endMs": 8245
+    },
+    {
+      "name": "Abrir Casos de prueba",
+      "status": "PASSED",
+      "startMs": 8245,
+      "endMs": 10627
+    },
+    {
+      "name": "Abrir el Asistente IA",
+      "status": "PASSED",
+      "startMs": 10627,
+      "endMs": 12731
+    },
+    {
+      "name": "Escribir y enviar un prompt",
+      "status": "PASSED",
+      "startMs": 12731,
+      "endMs": 17549
+    },
+    {
+      "name": "Revisar los escenarios sugeridos",
+      "status": "PASSED",
+      "startMs": 17549,
+      "endMs": 24879
+    },
+    {
+      "name": "Volver a la biblioteca",
+      "status": "PASSED",
+      "startMs": 24879,
+      "endMs": 26843
+    },
+    {
+      "name": "Abrir el formulario para crear un caso",
+      "status": "PASSED",
+      "startMs": 26843,
+      "endMs": 29082
+    },
+    {
+      "name": "Completar los datos del escenario",
+      "status": "PASSED",
+      "startMs": 29082,
+      "endMs": 40124
+    },
+    {
+      "name": "Seleccionar prioridad alta",
+      "status": "PASSED",
+      "startMs": 40124,
+      "endMs": 43578
+    },
+    {
+      "name": "Guardar y comprobar el caso",
+      "status": "PASSED",
+      "startMs": 43578,
+      "endMs": 45864
+    }
+  ],
+  "createdCase": {
+    "id": "TC-004",
+    "title": "Validación de login con credenciales inválidas",
+    "description": "Escribe credenciales incorrectas y comprueba que el acceso se rechaza.",
+    "priority": "High",
+    "status": "PENDING"
+  }
+}

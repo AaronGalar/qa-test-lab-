@@ -1,0 +1,27 @@
+{
+  "id": "TC-004",
+  "title": "Crear caso de prueba",
+  "status": "PASSED",
+  "steps": [
+    {
+      "name": "Login",
+      "startFrame": 0,
+      "endFrame": 75
+    },
+    {
+      "name": "Test Cases",
+      "startFrame": 75,
+      "endFrame": 140
+    },
+    {
+      "name": "Crear caso",
+      "startFrame": 140,
+      "endFrame": 200
+    },
+    {
+      "name": "Guardar",
+      "startFrame": 200,
+      "endFrame": 260
+    }
+  ]
+}
