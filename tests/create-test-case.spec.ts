@@ -6,6 +6,7 @@ import { createQaMetricRecorder } from "./qa-metrics";
 test("TC-004 - Crear caso de prueba", async ({ page }, testInfo) => {
   // Aumentamos el timeout a 90s para dar margen a las pausas naturales de escritura y ratón
   test.setTimeout(90_000);
+  const isRecordingBrowser = testInfo.project.name === "chromium";
 
   const metrics = createQaMetricRecorder(testInfo, {
     id: "TC-004",
@@ -93,20 +94,26 @@ test("TC-004 - Crear caso de prueba", async ({ page }, testInfo) => {
       };
 
       // Realizar un único movimiento nativo con múltiples pasos internos en Playwright
-      await page.mouse.move(target.x, target.y, { steps: 35 });
+      await page.mouse.move(target.x, target.y, {
+        steps: isRecordingBrowser ? 35 : 1,
+      });
       pointerPosition = target;
-      await page.waitForTimeout(100);
+      if (isRecordingBrowser) await page.waitForTimeout(100);
     }
   }
   async function clickLikeUser(locator: Locator) {
     await moveTo(locator);
     await locator.click();
-    await page.waitForTimeout(150); // Pausa post-clic para estabilidad visual
+    if (isRecordingBrowser) await page.waitForTimeout(150);
   }
 
   async function typeLikeUser(locator: Locator, value: string) {
     await moveTo(locator);
     await locator.click();
+    if (!isRecordingBrowser) {
+      await locator.fill(value);
+      return;
+    }
 
     for (const [index, character] of Array.from(value).entries()) {
       await locator.pressSequentially(character);
@@ -136,12 +143,12 @@ test("TC-004 - Crear caso de prueba", async ({ page }, testInfo) => {
   }
 
   try {
-    await installRecordingCursor();
+    if (isRecordingBrowser) await installRecordingCursor();
 
     await metrics.recordStep("Abrir login", async () => {
       await page.goto("http://localhost:3000/login");
       await expect(page).toHaveURL(/\/login$/);
-      await page.waitForTimeout(800); // Dar margen para grabar la pantalla de inicio limpia
+      if (isRecordingBrowser) await page.waitForTimeout(800);
     });
 
     await metrics.recordStep("Introducir credenciales", async () => {
@@ -190,7 +197,7 @@ test("TC-004 - Crear caso de prueba", async ({ page }, testInfo) => {
       });
       await expect(priorityOptions).toBeVisible();
       await expect(priorityOptions.getByRole("option")).toHaveCount(3);
-      await page.waitForTimeout(1100);
+      if (isRecordingBrowser) await page.waitForTimeout(1100);
       await clickLikeUser(
         priorityOptions.getByRole("option", { name: /^Alta/ }),
       );
@@ -203,7 +210,7 @@ test("TC-004 - Crear caso de prueba", async ({ page }, testInfo) => {
       await expect(
         page.getByText("Caso TC-004 guardado correctamente."),
       ).toBeVisible();
-      await page.waitForTimeout(2000); // Pausa final para que la confirmación quede bien recogida en el video
+      if (isRecordingBrowser) await page.waitForTimeout(2000);
     });
 
     metrics.finalize("PASSED");

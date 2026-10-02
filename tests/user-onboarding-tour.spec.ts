@@ -1,21 +1,32 @@
 // tests/user-onboarding-tour.spec.ts
-import { test, type Locator } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 
-test("TC-TUTORIAL - Tour completo con creación de caso de prueba", async ({ browser }) => {
+test("TC-TUTORIAL - Tour completo con creación de caso de prueba", async ({
+  browser,
+}, testInfo) => {
   test.setTimeout(120_000);
+  const isRecordingBrowser = testInfo.project.name === "chromium";
 
   const context = await browser.newContext({
-    recordVideo: {
-      dir: "public/recordings/",
-      size: { width: 1920, height: 1080 },
-    },
+    ...(isRecordingBrowser
+      ? {
+          recordVideo: {
+            dir: "public/recordings/",
+            size: { width: 1920, height: 1080 },
+          },
+        }
+      : {}),
     viewport: { width: 1920, height: 1080 },
   });
 
   const page = await context.newPage();
   const recording = page.video();
+
+  async function pauseForRecording(durationMs: number) {
+    if (isRecordingBrowser) await page.waitForTimeout(durationMs);
+  }
 
   // Puntero azul animado sobre la pantalla
   async function installCursor() {
@@ -53,8 +64,10 @@ test("TC-TUTORIAL - Tour completo con creación de caso de prueba", async ({ bro
   async function moveTo(locator: Locator) {
     const box = await locator.boundingBox();
     if (box) {
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 30 });
-      await page.waitForTimeout(250);
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, {
+        steps: isRecordingBrowser ? 30 : 1,
+      });
+      await pauseForRecording(250);
     }
   }
 
@@ -62,57 +75,66 @@ test("TC-TUTORIAL - Tour completo con creación de caso de prueba", async ({ bro
   async function clickLikeUser(locator: Locator) {
     await moveTo(locator);
     await locator.click();
-    await page.waitForTimeout(350);
+    await pauseForRecording(350);
   }
 
   // Escritura progresiva y entendible (90ms entre letras)
   async function typeLikeUser(locator: Locator, text: string) {
     await moveTo(locator);
     await locator.click();
+    if (!isRecordingBrowser) {
+      await locator.fill(text);
+      return;
+    }
+
     for (const char of text) {
       await locator.pressSequentially(char);
-      await page.waitForTimeout(90);
+      await pauseForRecording(90);
     }
-    await page.waitForTimeout(300);
+    await pauseForRecording(300);
   }
 
   try {
-    await installCursor();
+    if (isRecordingBrowser) await installCursor();
 
     // 1. Login
     await page.goto("http://localhost:3000/login");
-    await page.waitForTimeout(2000);
+    await pauseForRecording(2000);
     await typeLikeUser(page.getByLabel("Email"), "qa@test.com");
     await typeLikeUser(page.getByLabel("Contraseña"), "123456");
     await clickLikeUser(page.getByRole("button", { name: "Iniciar sesión" }));
-    await page.waitForTimeout(2500);
+    await expect(
+      page.getByRole("heading", { name: "Resumen de calidad" }),
+    ).toBeVisible();
 
     // 2. Ir a Casos de Prueba
     await clickLikeUser(page.getByRole("link", { name: "Casos de prueba" }));
-    await page.waitForTimeout(2500);
+    await expect(
+      page.getByRole("heading", { name: "Casos de prueba" }),
+    ).toBeVisible();
 
     // 3. Abrir el formulario "Nuevo caso"
     const newCaseBtn = page.getByRole("button", { name: /nuevo caso/i });
-    if (await newCaseBtn.isVisible().catch(() => false)) {
-      await clickLikeUser(newCaseBtn);
-    }
-    await page.waitForTimeout(2000);
+    await clickLikeUser(newCaseBtn);
+    await expect(
+      page.getByRole("heading", { name: "Crea un caso de prueba" }),
+    ).toBeVisible();
 
     // 4. Rellenar los campos del Caso de Prueba
     await typeLikeUser(
       page.getByLabel(/título/i),
-      "Verificar inicio de sesión con credenciales válidas"
+      "Verificar inicio de sesión con credenciales válidas",
     );
     await typeLikeUser(
       page.getByLabel(/descripción/i),
-      "El usuario introduce email y clave correctos y accede al Dashboard sin errores."
+      "El usuario introduce email y clave correctos y accede al Dashboard sin errores.",
     );
 
     // Selección de Prioridad resiliente (evita colgar el test)
     const prioritySelect = page.getByLabel(/prioridad/i);
     if (await prioritySelect.isVisible().catch(() => false)) {
       await clickLikeUser(prioritySelect);
-      
+
       const nativeSelect = page.locator("select[name='priority']");
       if ((await nativeSelect.count().catch(() => 0)) > 0) {
         await nativeSelect.selectOption({ label: "ALTA" }).catch(() => {});
@@ -130,7 +152,9 @@ test("TC-TUTORIAL - Tour completo con creación de caso de prueba", async ({ bro
       await clickLikeUser(saveBtn);
     }
 
-    await page.waitForTimeout(3000);
+    await expect(
+      page.getByText("Verificar inicio de sesión con credenciales válidas"),
+    ).toBeVisible();
 
     // Guardar vídeo en disco antes de cerrar la página
     const recordingPath = path.resolve(process.cwd(), "public", "recordings");
