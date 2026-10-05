@@ -1,0 +1,39 @@
+{
+  "id": "TAREAS",
+  "title": "Gestionar tareas",
+  "status": "PASSED",
+  "startedAt": 1791203095512,
+  "durationMs": 5453,
+  "steps": [
+    {
+      "name": "Visitar la página de tareas",
+      "status": "PASSED",
+      "startMs": 0,
+      "endMs": 1328
+    },
+    {
+      "name": "Validar tareas vacías",
+      "status": "PASSED",
+      "startMs": 1328,
+      "endMs": 2479
+    },
+    {
+      "name": "Añadir una tarea",
+      "status": "PASSED",
+      "startMs": 2480,
+      "endMs": 3512
+    },
+    {
+      "name": "Marcar y desmarcar la tarea",
+      "status": "PASSED",
+      "startMs": 3512,
+      "endMs": 4520
+    },
+    {
+      "name": "Eliminar la tarea",
+      "status": "PASSED",
+      "startMs": 4520,
+      "endMs": 5453
+    }
+  ]
+}

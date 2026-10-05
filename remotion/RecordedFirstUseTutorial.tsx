@@ -26,6 +26,16 @@ export type RecordedFirstUseTutorialProps = {
 };
 
 const STEP_GUIDANCE: Record<string, string> = {
+  "Visitar la página de tareas":
+    "Abre la página y comprueba el campo para crear tareas.",
+  "Validar tareas vacías":
+    "Una descripción vacía o con solo espacios no crea una tarea.",
+  "Añadir una tarea":
+    "Escribe la tarea y confirma que aparece en la lista.",
+  "Marcar y desmarcar la tarea":
+    "Alterna el estado completada desde el botón de acción.",
+  "Eliminar la tarea":
+    "Elimina la tarea y verifica que ya no aparece.",
   "Abrir la pantalla de inicio de sesión":
     "Entra en QA Test Lab con tu cuenta de demostración.",
   "Introducir las credenciales de demostración":

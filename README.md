@@ -24,6 +24,7 @@ QA Test Lab es una demo interactiva para recorrer tareas habituales de testing y
 | Área                | Qué puedes probar                                                                              |
 | ------------------- | ---------------------------------------------------------------------------------------------- |
 | **Casos de prueba** | Crear casos, asignar prioridad, buscar, filtrar, cambiar estados y revisar métricas.           |
+| **Tareas**          | Añadir tareas, marcarlas como completadas y eliminarlas.                                       |
 | **Asistente QA**    | Explorar una conversación de ejemplo sobre escenarios de prueba. Las respuestas son simuladas. |
 | **Vídeos QA**       | Grabar interacciones del navegador, medir pasos y renderizar tutoriales en MP4.                |
 
@@ -66,6 +67,8 @@ Abre [http://localhost:3000](http://localhost:3000). Para entrar en la demo:
 | `npm run render:tutorial` | Graba el recorrido y renderiza el tutorial completo.                     |
 | `npm run render:ai-demo`  | Renderiza el vídeo de demostración del asistente.                        |
 | `npm run render:qa`       | Renderiza el vídeo del caso TC-004.                                      |
+| `npm run test:tareas`     | Prueba el flujo de añadir, completar y eliminar tareas en Chromium.      |
+| `npm run render:tareas`   | Ejecuta el test de tareas y renderiza `output/Tareas.mp4` con Remotion.   |
 
 ## Recorrido en vídeo
 
@@ -82,6 +85,8 @@ npm run render:tutorial
 ```
 
 La grabación fuente queda en `public/recordings/tutorial-ia.webm` y el vídeo final en `output/Tutorial-primer-uso.mp4`. Los vídeos y sus imágenes de vista previa están en `output/`; las grabaciones y datos de prueba, en `public/`.
+
+El recorrido de tareas puede probarse y renderizarse con `npm run render:tareas`. Si el test de Chromium pasa, Remotion genera `output/Tareas.mp4`.
 
 ## Estructura
 
