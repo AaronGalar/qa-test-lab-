@@ -33,9 +33,6 @@ export default defineConfig({
       mode: "on",
       size: { width: 1920, height: 1080 },
     },
-    launchOptions: {
-      args: ["--force-device-scale-factor=1"],
-    },
   },
 
   /* Configure projects for major browsers */
