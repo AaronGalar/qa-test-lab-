@@ -16,6 +16,7 @@ test("Tutorial real - desde el login hasta guardar un caso sugerido por IA", asy
   test.setTimeout(180_000);
 
   const recordingDirectory = testInfo.outputPath("recording");
+  const isRecordingBrowser = testInfo.project.name === "chromium";
   const recordingPath = path.resolve(
     process.cwd(),
     "public",
@@ -25,13 +26,18 @@ test("Tutorial real - desde el login hasta guardar un caso sugerido por IA", asy
   mkdirSync(recordingDirectory, { recursive: true });
   mkdirSync(path.dirname(recordingPath), { recursive: true });
 
+  // Solo Chromium genera los artefactos públicos que consume Remotion.
   const context = await browser.newContext({
     viewport: { width: 1920, height: 1080 },
     deviceScaleFactor: 1,
-    recordVideo: {
-      dir: recordingDirectory,
-      size: { width: 1920, height: 1080 },
-    },
+    ...(isRecordingBrowser
+      ? {
+          recordVideo: {
+            dir: recordingDirectory,
+            size: { width: 1920, height: 1080 },
+          },
+        }
+      : {}),
   });
   const page = await context.newPage();
   const recording = page.video();
@@ -232,14 +238,16 @@ test("Tutorial real - desde el login hasta guardar un caso sugerido por IA", asy
     });
 
     await page.waitForTimeout(1800);
-    metrics.finalize("PASSED");
+    if (isRecordingBrowser) metrics.finalize("PASSED");
   } catch (error) {
-    metrics.finalize("FAILED");
+    if (isRecordingBrowser) metrics.finalize("FAILED");
     throw error;
   } finally {
-    if (recording) {
+    if (isRecordingBrowser && recording) {
       await page.close().catch(() => {});
       await recording.saveAs(recordingPath);
+    } else {
+      await page.close().catch(() => {});
     }
     await context.close();
   }

@@ -21,6 +21,7 @@
 /build
 /dashboard-debug.png
 /output/*.remotion-in-progress
+/output/*-remotion-props.json
 
 # misc
 .DS_Store
@@ -49,3 +50,4 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+/public/recordings/page@*.webm

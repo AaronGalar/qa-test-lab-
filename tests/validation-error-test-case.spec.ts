@@ -11,7 +11,6 @@ test("TC-007 - Validar campos obligatorios al crear caso", async ({ page }, test
     title: "Validar campos obligatorios al crear caso",
   });
   const recording = page.video();
-  let pointerPosition = { x: 0, y: 0 };
 
   async function installRecordingCursor() {
     await page.addInitScript(() => {
@@ -78,7 +77,6 @@ test("TC-007 - Validar campos obligatorios al crear caso", async ({ page }, test
         y: box.y + box.height / 2,
       };
       await page.mouse.move(target.x, target.y, { steps: 35 });
-      pointerPosition = target;
       await page.waitForTimeout(100);
     }
   }

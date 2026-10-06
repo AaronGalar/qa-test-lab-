@@ -25,7 +25,9 @@ QA Test Lab es una demo interactiva para recorrer tareas habituales de testing y
 | ------------------- | ---------------------------------------------------------------------------------------------- |
 | **Casos de prueba** | Crear casos, asignar prioridad, buscar, filtrar, cambiar estados y revisar métricas.           |
 | **Tareas**          | Añadir tareas, marcarlas como completadas y eliminarlas.                                       |
-| **Asistente QA**    | Explorar una conversación de ejemplo sobre escenarios de prueba. Las respuestas son simuladas. |
+| **Preguntas frecuentes** | Añadir preguntas a una lista local y practicar componentes con props.                       |
+| **Asistente QA**         | Explorar una conversación de ejemplo sobre escenarios de prueba. Las respuestas son simuladas. |
+| **Aprender React**       | Seguir retos paso a paso sobre estado, listas, formularios y pruebas E2E.                       |
 | **Vídeos QA**       | Grabar interacciones del navegador, medir pasos y renderizar tutoriales en MP4.                |
 
 <p align="center">
@@ -61,13 +63,15 @@ Abre [http://localhost:3000](http://localhost:3000). Para entrar en la demo:
 | `npm run build`           | Genera la compilación de producción.                                     |
 | `npm run start`           | Sirve la compilación de producción.                                      |
 | `npm run lint`            | Ejecuta ESLint.                                                          |
-| `npx playwright test`     | Ejecuta la suite de pruebas; Playwright levanta Next.js automáticamente. |
+| `npx tsc --noEmit`        | Comprueba los tipos de TypeScript.                                       |
+| `npx playwright test`     | Ejecuta la suite en Chromium, Firefox y WebKit.                          |
+| `npx playwright test --project=chromium` | Ejecuta la suite en Chromium y guarda los vídeos QA.          |
+| `npm run test:tareas`     | Prueba el flujo de añadir, completar y eliminar tareas en Chromium.      |
 | `npm run remotion`        | Abre Remotion Studio con las composiciones del proyecto.                 |
 | `npm run record:tutorial` | Graba el recorrido de primer uso con Playwright.                         |
 | `npm run render:tutorial` | Graba el recorrido y renderiza el tutorial completo.                     |
-| `npm run render:ai-demo`  | Renderiza el vídeo de demostración del asistente.                        |
-| `npm run render:qa`       | Renderiza el vídeo del caso TC-004.                                      |
-| `npm run test:tareas`     | Prueba el flujo de añadir, completar y eliminar tareas en Chromium.      |
+| `npm run render:ai-demo`  | Renderiza la composición de demostración del asistente IA.               |
+| `npm run render:qa`       | Renderiza TC-004 usando la grabación y métricas disponibles.             |
 | `npm run render:tareas`   | Ejecuta el test de tareas y renderiza `output/Tareas.mp4` con Remotion.   |
 
 ## Recorrido en vídeo
@@ -84,25 +88,30 @@ Para generar el tutorial de primer uso:
 npm run render:tutorial
 ```
 
-La grabación fuente queda en `public/recordings/tutorial-ia.webm` y el vídeo final en `output/Tutorial-primer-uso.mp4`. Los vídeos y sus imágenes de vista previa están en `output/`; las grabaciones y datos de prueba, en `public/`.
+La grabación fuente queda en `public/recordings/tutorial-ia.webm` y el vídeo final en `output/Tutorial-primer-uso.mp4`. La demo del asistente se genera como `output/Demo-asistente-IA.mp4`. Los renders e imágenes de vista previa se guardan en `output/`; las grabaciones fuente y los datos de prueba, en `public/`.
 
-El recorrido de tareas puede probarse y renderizarse con `npm run render:tareas`. Si el test de Chromium pasa, Remotion genera `output/Tareas.mp4`.
+El recorrido de tareas puede probarse y renderizarse con `npm run render:tareas`. Si el test de Chromium pasa, Remotion genera `output/Tareas.mp4`. Para ejecutar un escenario completo de extremo a extremo y producir su grabación QA, usa `npm run render:qa -- TC-004`.
 
 ## Estructura
 
 ```text
-app/                  Pantallas de Next.js
-tests/                Escenarios E2E y métricas QA
-public/recordings/    Vídeos fuente de Playwright
-public/test-data/     Resultados y tiempos por escenario
-remotion/             Composiciones de vídeo
-scripts/              Automatización de grabación y render
-output/               MP4 y vistas previas generadas
-docs/                 Guías de trabajo y creación de vídeos
+app/                  Rutas y componentes compartidos de Next.js
+  components/         Navegación reutilizable
+  aprender/           Retos guiados de React y QA
+  faq/                Preguntas y ejemplo de props
+tests/                Pruebas Playwright y recopilador de métricas
+public/recordings/    Grabaciones fuente para los tutoriales
+public/test-data/     Cronologías QA utilizadas por Remotion
+remotion/             Composiciones de vídeo reutilizables
+scripts/              Comandos para grabar y renderizar vídeos
+output/               Archivos generados al renderizar
+docs/                 Guías de trabajo y creación de vídeos QA
 ```
 
 ## Documentación
 
+- Abre `/aprender` en la aplicación para seguir ejercicios guiados basados en QA Test Lab.
+- Ejecuta `npx playwright test --project=chromium tests/learning.spec.ts tests/ai-demo.spec.ts tests/login.spec.ts` para validar la guía y los flujos básicos sin recorrer todos los navegadores.
 - [Guía práctica para crear vídeos QA](docs/GUIA-CREAR-VIDEOS-QA.md)
 - [Guía para modificar vídeos QA](docs/GUIA-TRABAJO-MODIFICAR-VIDEOS-QA.md)
 - [Playbook de IA para vídeos QA](docs/PLAYBOOK-IA-VIDEOS-QA.md)

@@ -29,6 +29,7 @@ export type QaMetadata = {
 
 const PRESENTATION_PAUSE_MS = 900;
 
+// Cada escenario comparte este recorder para sincronizar el test y el vídeo.
 export function createQaMetricRecorder(
   testInfo: TestInfo,
   initialData: {
@@ -50,9 +51,12 @@ export function createQaMetricRecorder(
 
     try {
       const result = await action();
-      await new Promise((resolve) =>
-        setTimeout(resolve, PRESENTATION_PAUSE_MS),
-      );
+      // Las pausas hacen legible la grabación y no ralentizan los otros navegadores.
+      if (testInfo.project.name === "chromium") {
+        await new Promise((resolve) =>
+          setTimeout(resolve, PRESENTATION_PAUSE_MS),
+        );
+      }
       const endMs = toRelativeMs();
 
       steps.push({
@@ -91,6 +95,9 @@ export function createQaMetricRecorder(
         ? { createdCase: initialData.createdCase }
         : {}),
     };
+
+    // Los artefactos públicos son la fuente del render; Chromium es quien los produce.
+    if (testInfo.project.name !== "chromium") return metadata;
 
     const outputDir = path.resolve(testInfo.outputDir);
     mkdirSync(outputDir, { recursive: true });

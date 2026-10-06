@@ -2,56 +2,56 @@
   "id": "TC-007",
   "title": "Validar campos obligatorios al crear caso",
   "status": "PASSED",
-  "startedAt": 1790587647964,
-  "durationMs": 30012,
+  "startedAt": 1791204319475,
+  "durationMs": 72436,
   "steps": [
     {
       "name": "Abrir login",
       "status": "PASSED",
-      "startMs": 3,
-      "endMs": 2205
+      "startMs": 4,
+      "endMs": 2465
     },
     {
       "name": "Introducir credenciales",
       "status": "PASSED",
-      "startMs": 2205,
-      "endMs": 8006
+      "startMs": 2465,
+      "endMs": 17613
     },
     {
       "name": "Iniciar sesión",
       "status": "PASSED",
-      "startMs": 8006,
-      "endMs": 10842
+      "startMs": 17613,
+      "endMs": 22935
     },
     {
       "name": "Abrir Test Cases",
       "status": "PASSED",
-      "startMs": 10842,
-      "endMs": 13361
+      "startMs": 22935,
+      "endMs": 30392
     },
     {
       "name": "Abrir formulario",
       "status": "PASSED",
-      "startMs": 13361,
-      "endMs": 15787
+      "startMs": 30392,
+      "endMs": 37181
     },
     {
       "name": "Intentar guardar sin rellenar datos",
       "status": "PASSED",
-      "startMs": 15787,
-      "endMs": 19383
+      "startMs": 37181,
+      "endMs": 44555
     },
     {
       "name": "Comprobar validación de descripción",
       "status": "PASSED",
-      "startMs": 19383,
-      "endMs": 26742
+      "startMs": 44555,
+      "endMs": 64226
     },
     {
       "name": "Cancelar acción",
       "status": "PASSED",
-      "startMs": 26742,
-      "endMs": 30012
+      "startMs": 64227,
+      "endMs": 72436
     }
   ]
 }

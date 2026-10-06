@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect } from "react";
-import Link from "next/link";
+import AppNavigation from "../components/AppNavigation";
 
 export type TestCase = {
   id: string;
@@ -36,7 +36,15 @@ const initialTests: TestCase[] = [
 ];
 
 export default function TestCasesPage() {
+  // Estado local para practicar cómo React actualiza la interfaz tras cada acción.
   const [tests, setTests] = useState<TestCase[]>(initialTests);
+  // Contador de alta monotónica: borrar un caso no hace que su ID se reutilice.
+  const nextCaseNumber = useRef(
+    initialTests.reduce((highest, test) => {
+      const number = Number(test.id.replace("TC-", ""));
+      return Number.isNaN(number) ? highest : Math.max(highest, number);
+    }, 0) + 1,
+  );
   const [showForm, setShowForm] = useState(false);
 
   // Estado del Formulario
@@ -99,9 +107,8 @@ export default function TestCasesPage() {
     setFormError("");
     setIsSaving(true);
 
-    const nextNumber = tests.length + 1;
     const newTest: TestCase = {
-      id: `TC-${String(nextNumber).padStart(3, "0")}`,
+      id: `TC-${String(nextCaseNumber.current).padStart(3, "0")}`,
       title: title.trim(),
       description: description.trim(),
       priority,
@@ -109,6 +116,7 @@ export default function TestCasesPage() {
     };
 
     await new Promise((resolve) => setTimeout(resolve, 300));
+    nextCaseNumber.current += 1;
     setTests((prev) => [...prev, newTest]);
     setSavedCaseId(newTest.id);
 
@@ -173,31 +181,7 @@ export default function TestCasesPage() {
       </header>
 
       <div className="mx-auto flex max-w-[1600px]">
-        {/* Sidebar */}
-        <aside className="hidden min-h-[calc(100vh-73px)] w-64 shrink-0 border-r border-white/[0.07] bg-[#091627]/55 p-5 md:block">
-          <nav className="space-y-2">
-            <Link
-              href="/"
-              className="block rounded-xl px-4 py-3 text-sm text-slate-400 hover:bg-white/[0.06] hover:text-slate-100 transition-colors"
-            >
-              <span className="mr-3 text-slate-600">01</span>Resumen
-            </Link>
-
-            <Link
-              href="/test-cases"
-              className="block rounded-xl border border-sky-300/20 bg-sky-400/15 px-4 py-3 text-sm font-semibold text-sky-100 shadow-[inset_3px_0_0_#38bdf8]"
-            >
-              <span className="mr-3 text-sky-300">02</span>Casos de prueba
-            </Link>
-
-            <Link
-              href="/test-cases/ai-demo"
-              className="block rounded-xl px-4 py-3 text-sm text-slate-400 hover:bg-white/[0.06] hover:text-slate-100 transition-colors"
-            >
-              <span className="mr-3 text-slate-600">03</span>Asistente IA
-            </Link>
-          </nav>
-        </aside>
+        <AppNavigation activeHref="/test-cases" />
 
         {/* Ámbito Principal */}
         <section className="min-w-0 flex-1 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.10),transparent_34%)] p-6 lg:p-10">
@@ -509,6 +493,7 @@ export default function TestCasesPage() {
           </div>
 
           {/* Tabla de Casos de Prueba */}
+          {/* map() transforma cada elemento del estado en una fila identificada por su ID. */}
           <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0b192b]/80 shadow-2xl shadow-black/10">
             <div className="hidden grid-cols-[90px_1fr_120px_130px_70px] border-b border-white/[0.07] px-6 py-4 text-xs font-semibold uppercase tracking-wide text-slate-500 sm:grid">
               <span>ID</span>
@@ -581,6 +566,7 @@ export default function TestCasesPage() {
                   <div className="text-right">
                     <button
                       onClick={() => deleteTestCase(test.id)}
+                      aria-label={`Eliminar caso de prueba ${test.id}`}
                       title="Eliminar caso de prueba"
                       className="text-xs text-slate-500 hover:text-red-400 transition-colors p-1"
                     >

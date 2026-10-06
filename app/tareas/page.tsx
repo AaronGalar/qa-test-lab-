@@ -2,7 +2,7 @@
 "use client";
 
 // Importamos useState desde React para crear la "memoria" de nuestra aplicación
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 // Importamos Link de Next.js para navegar entre páginas sin recargar la pantalla
 import Link from "next/link";
 
@@ -19,10 +19,12 @@ export default function TasksPage() {
 
   // ESTADO 2: Guarda la lista completa de tareas.
   // <Tarea[]> indica a TypeScript que este arreglo solo guardará objetos que sigan la interfaz Tarea
-  const [listatareas, setTareas] = useState<Tarea[]>([]);
+  const [listaTareas, setTareas] = useState<Tarea[]>([]);
 
-  // FUNCIÓN 1: Añadir una nueva tarea
-  const agregarTarea = () => {
+  // FUNCIÓN 1: Añadir una tarea al enviar el formulario, también con la tecla Enter.
+  const agregarTarea = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     // .trim() quita los espacios al inicio y al final.
     // Si la cadena queda vacía "", el 'return' detiene la función y no añade nada.
     if (textoTarea.trim() === "") return;
@@ -37,7 +39,7 @@ export default function TasksPage() {
     // Actualizamos la lista de tareas.
     // [...listatareas, nuevaTarea] usa el operador 'spread' (...):
     // Copia todas las tareas anteriores y coloca la nueva al final del arreglo.
-    setTareas([...listatareas, nuevaTarea]);
+    setTareas((tareasActuales) => [...tareasActuales, nuevaTarea]);
 
     // Limpiamos el valor del estado del texto para que el <input> vuelva a quedar vacío
     setTextoTarea("");
@@ -46,9 +48,9 @@ export default function TasksPage() {
   // FUNCIÓN 2: Marcar / Desmarcar tarea como completada
   const alternarCompletada = (id: number) => {
     // prevTareas es el valor más reciente de la lista
-    setTareas((prevTareas) =>
-      // .map() recorre la lista una por una y crea una nueva lista
-      prevTareas.map((tarea) =>
+    setTareas((tareasActuales) =>
+      // map() crea una lista nueva y solo reemplaza la tarea que coincide por ID.
+      tareasActuales.map((tarea) =>
         // ¿Es esta la tarea que el usuario clickeó? (comparamos IDs)
         tarea.id === id
           ? { ...tarea, completada: !tarea.completada } // SÍ: Copia la tarea e invierte completada (true <-> false)
@@ -76,28 +78,32 @@ export default function TasksPage() {
           Lista de tareas
         </h1>
 
-        {/* INPUT: Vinculado bidireccionalmente con el estado textoTarea */}
-        <input
-          type="text"
-          placeholder="Añade aquí tu tarea"
-          value={textoTarea} // El input siempre muestra lo que hay en el estado
-          onChange={(e) => setTextoTarea(e.target.value)} // Al escribir, e.target.value actualiza el estado
-          className="mt-6 bg-[#0b192b] border border-white/[0.08] placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 p-2 rounded-lg text-white w-full"
-        />
+        <form onSubmit={agregarTarea}>
+          {/* Un input controlado refleja el estado y lo actualiza en cada cambio. */}
+          <label htmlFor="texto-tarea" className="sr-only">
+            Nueva tarea
+          </label>
+          <input
+            id="texto-tarea"
+            type="text"
+            placeholder="Añade aquí tu tarea"
+            value={textoTarea}
+            onChange={(e) => setTextoTarea(e.target.value)}
+            className="mt-6 w-full rounded-lg border border-white/[0.08] bg-[#0b192b] p-2 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500"
+          />
 
-
-        {/* BOTÓN: Llama a la función agregarTarea al hacer clic */}
-        <button
-          className="mt-4 bg-sky-500 text-slate-950 px-4 py-2 rounded-lg hover:bg-sky-600 transition-colors"
-          onClick={agregarTarea}
-        >
-          Añadir tarea
-        </button>
+          <button
+            className="mt-4 rounded-lg bg-sky-500 px-4 py-2 text-slate-950 transition-colors hover:bg-sky-400"
+            type="submit"
+          >
+            Añadir tarea
+          </button>
+        </form>
 
         {/* LISTA: Renderizado dinámico de las tareas */}
         <ul className="mt-6 space-y-2">
           {/* .map() recorre el arreglo 'listatareas' y genera un <li> por cada tarea */}
-          {listatareas.map((tarea) => (
+          {listaTareas.map((tarea) => (
             <li
               // key es Obligatorio en React para que sepa exactamente qué elemento modificar en el DOM
               key={tarea.id}

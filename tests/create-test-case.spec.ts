@@ -20,7 +20,6 @@ test("TC-004 - Crear caso de prueba", async ({ page }, testInfo) => {
     },
   });
   const recording = page.video();
-  let pointerPosition = { x: 0, y: 0 };
 
   async function installRecordingCursor() {
     await page.addInitScript(() => {
@@ -97,7 +96,6 @@ test("TC-004 - Crear caso de prueba", async ({ page }, testInfo) => {
       await page.mouse.move(target.x, target.y, {
         steps: isRecordingBrowser ? 35 : 1,
       });
-      pointerPosition = target;
       if (isRecordingBrowser) await page.waitForTimeout(100);
     }
   }

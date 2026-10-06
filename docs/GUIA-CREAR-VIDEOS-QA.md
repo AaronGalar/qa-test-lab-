@@ -7,7 +7,7 @@ Este documento explica como repetir el flujo de este proyecto para convertir un 
 - **Next.js**: contiene la aplicacion que se va a demostrar.
 - **Playwright**: ejecuta el caso de uso en un navegador real y graba el WebM.
 - **qa-metrics**: mide cuanto dura cada paso y genera un JSON con la linea temporal.
-- **Remotion**: coloca el WebM en una composicion, anade instrucciones, cursor, zoom y progreso.
+- **Remotion**: coloca el WebM en una composicion, anade instrucciones y progreso.
 - **FFmpeg**, usado internamente por Remotion: convierte la composicion a MP4 H.264.
 
 El flujo completo es:
@@ -37,11 +37,11 @@ output/TC-004.mp4            Video final
 Desde la raiz del proyecto:
 
 ```powershell
-npm install
-npm run dev
+npm ci
+npx playwright install
 ```
 
-El servidor debe estar disponible en `http://localhost:3000` antes de ejecutar Playwright.
+Playwright inicia el servidor de desarrollo automaticamente. Para probar la aplicación a mano, ejecuta `npm run dev` y abre `http://localhost:3000`.
 
 ## 4. Escribir el caso de uso
 
@@ -154,11 +154,11 @@ Ese JSON permite que Remotion sepa que paso debe mostrar en cada frame.
 
 ## 9. Crear la composicion Remotion
 
-`QARecording.tsx` debe hacer cuatro cosas:
+El script `render-tc004.mjs` prepara las props a partir del JSON y valida la fuente antes de renderizar. `QARecording.tsx` se ocupa de:
 
-1. Leer el JSON de `public/test-data`.
+1. Recibir la cronologia del test como props.
 2. Convertir el frame actual a milisegundos.
-3. Elegir el paso activo.
+3. Elegir el paso activo usando los tiempos medidos por Playwright.
 4. Pintar el video y las ayudas visuales.
 
 La relacion basica es:
@@ -184,7 +184,7 @@ Las ayudas no deben tapar el contenido principal. El video de la aplicacion debe
 
 ## 10. Elegir la duracion
 
-La duracion de Remotion debe cubrir el tiempo del WebM despues de aplicar el playback rate.
+La duracion de Remotion debe cubrir el tiempo del WebM y un breve margen final.
 
 Formula aproximada:
 
@@ -192,21 +192,17 @@ Formula aproximada:
 duracion del render >= durationMs / playbackRate + margen
 ```
 
-En este proyecto se usa una duracion fija de 24 segundos (`720 frames` a 30 FPS), suficiente para el caso actual. Para un sistema general es mejor calcularla automaticamente a partir del JSON y anadir entre 1 y 2 segundos de margen.
+El script `render-tc004.mjs` calcula la duracion a partir del JSON y anade 1,2 segundos de margen. La composicion `QARecording` recibe los datos del caso como props de Remotion.
 
 ## 11. Renderizar el MP4
 
 El script actual usa H.264 con calidad alta:
 
 ```powershell
-npm run render:qa
+npm run render:qa -- TC-004
 ```
 
-Internamente ejecuta:
-
-```powershell
-npx remotion render remotion/index.ts QARecording output/TC-004.mp4 --overwrite --codec=h264 --crf=18
-```
+Internamente, el script crea un archivo temporal de props, calcula la duracion necesaria y lo elimina al terminar. Tambien puedes indicar otro ID si existen sus datos y grabacion: `npm run render:qa -- TC-005`.
 
 Si Windows bloquea el archivo anterior, elimina solo el artefacto generado y repite:
 

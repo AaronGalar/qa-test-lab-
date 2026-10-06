@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -11,7 +12,9 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleLogin() {
+  // Es una validación local de demostración, no un sistema de autenticación real.
+  async function handleLogin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     setError("");
 
     if (!email || !password) {
@@ -19,7 +22,7 @@ export default function LoginPage() {
       return;
     }
 
-    if (email === "qa@test.com" && password === "123456") {
+    if (email.trim().toLowerCase() === "qa@test.com" && password === "123456") {
       setIsSubmitting(true);
       await new Promise((resolve) => setTimeout(resolve, 450));
       router.push("/");
@@ -45,7 +48,7 @@ export default function LoginPage() {
         </div>
 
         <div className="rounded-2xl border border-white/[0.09] bg-[#0b192b]/90 p-7 shadow-2xl shadow-black/20">
-          <div className="space-y-5">
+          <form className="space-y-5" onSubmit={handleLogin}>
             <div>
               <label htmlFor="email" className="mb-2 block text-sm font-medium">
                 Email
@@ -54,6 +57,8 @@ export default function LoginPage() {
               <input
                 id="email"
                 type="email"
+                autoComplete="username"
+                required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="qa@test.com"
@@ -72,6 +77,8 @@ export default function LoginPage() {
               <input
                 id="password"
                 type="password"
+                autoComplete="current-password"
+                required
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="••••••••"
@@ -86,13 +93,13 @@ export default function LoginPage() {
             )}
 
             <button
-              onClick={handleLogin}
+              type="submit"
               disabled={isSubmitting}
               className="w-full rounded-xl bg-sky-400 px-4 py-3 text-sm font-bold text-sky-950 hover:bg-sky-300 disabled:cursor-wait disabled:opacity-70"
             >
               {isSubmitting ? "Comprobando acceso..." : "Iniciar sesión"}
             </button>
-          </div>
+          </form>
         </div>
 
         <p className="mt-6 text-center text-xs text-slate-500">

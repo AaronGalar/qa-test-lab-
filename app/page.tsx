@@ -1,4 +1,6 @@
 import Link from "next/link";
+import AppNavigation from "./components/AppNavigation";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#07111f] text-white antialiased">
@@ -28,27 +30,7 @@ export default function Home() {
       </header>
 
       <div className="mx-auto flex max-w-[1600px]">
-        <aside className="hidden min-h-[calc(100vh-73px)] w-64 shrink-0 border-r border-white/[0.07] bg-[#091627]/55 p-5 md:block">
-          <nav className="space-y-2">
-            <button className="w-full rounded-xl border border-sky-300/20 bg-sky-400/15 px-4 py-3 text-left text-sm font-semibold text-sky-100 shadow-[inset_3px_0_0_#38bdf8]">
-              <span className="mr-3 text-sky-300">01</span>Resumen
-            </button>
-
-            <Link
-              href="/test-cases"
-              className="block w-full rounded-xl px-4 py-3 text-left text-sm text-slate-400 hover:bg-white/[0.06] hover:text-slate-100"
-            >
-              <span className="mr-3 text-slate-600">02</span>Casos de prueba
-            </Link>
-
-            <Link
-              href="/test-cases/ai-demo"
-              className="block w-full rounded-xl px-4 py-3 text-left text-sm text-slate-400 hover:bg-white/[0.06] hover:text-slate-100"
-            >
-              <span className="mr-3 text-slate-600">03</span>Asistente IA
-            </Link>
-          </nav>
-        </aside>
+        <AppNavigation activeHref="/" />
 
         <section className="min-w-0 flex-1 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.10),transparent_34%)] p-6 lg:p-10">
           <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
@@ -127,6 +109,7 @@ function StatCard({
   icon: string;
   tone: "sky" | "green" | "amber";
 }) {
+  // El tipo literal de "tone" limita el estilo a las tres variantes definidas.
   const tones = {
     sky: "border-sky-300/15 bg-sky-300/[0.07] text-sky-300",
     green: "border-green-300/15 bg-green-300/[0.07] text-green-300",
@@ -159,6 +142,7 @@ function TestRow({
   title: string;
   status: "PASS" | "FAIL";
 }) {
+  // El estado determina tanto el texto como el color que ve la persona usuaria.
   const passed = status === "PASS";
 
   return (

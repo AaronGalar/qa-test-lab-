@@ -8,10 +8,12 @@ test("TC-008 - Cambiar estado de un caso de prueba", async ({
 }, testInfo) => {
   test.setTimeout(90_000);
 
-  // Grabación en Full HD (1080p)
+  // Guarda el vídeo temporal dentro de los resultados de este test.
+  const recordingDirectory = testInfo.outputPath("recording");
+  mkdirSync(recordingDirectory, { recursive: true });
   const context = await browser.newContext({
     recordVideo: {
-      dir: "public/recordings/",
+      dir: recordingDirectory,
       size: { width: 1920, height: 1080 },
     },
     viewport: { width: 1920, height: 1080 },

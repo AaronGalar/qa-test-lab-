@@ -2,80 +2,80 @@
   "id": "TUTORIAL-IA",
   "title": "Primer uso de QA Test Lab y el asistente de IA",
   "status": "PASSED",
-  "startedAt": 1790854951348,
-  "durationMs": 47678,
+  "startedAt": 1791204210595,
+  "durationMs": 93860,
   "steps": [
     {
       "name": "Abrir la pantalla de inicio de sesión",
       "status": "PASSED",
-      "startMs": 6,
-      "endMs": 1370
+      "startMs": 7,
+      "endMs": 1535
     },
     {
       "name": "Introducir las credenciales de demostración",
       "status": "PASSED",
-      "startMs": 1370,
-      "endMs": 5541
+      "startMs": 1535,
+      "endMs": 9859
     },
     {
       "name": "Iniciar sesión",
       "status": "PASSED",
-      "startMs": 5541,
-      "endMs": 8245
+      "startMs": 9859,
+      "endMs": 13562
     },
     {
       "name": "Abrir Casos de prueba",
       "status": "PASSED",
-      "startMs": 8245,
-      "endMs": 10627
+      "startMs": 13562,
+      "endMs": 17871
     },
     {
       "name": "Abrir el Asistente IA",
       "status": "PASSED",
-      "startMs": 10627,
-      "endMs": 12731
+      "startMs": 17871,
+      "endMs": 22258
     },
     {
       "name": "Escribir y enviar un prompt",
       "status": "PASSED",
-      "startMs": 12731,
-      "endMs": 17549
+      "startMs": 22258,
+      "endMs": 34886
     },
     {
       "name": "Revisar los escenarios sugeridos",
       "status": "PASSED",
-      "startMs": 17549,
-      "endMs": 24879
+      "startMs": 34886,
+      "endMs": 43778
     },
     {
       "name": "Volver a la biblioteca",
       "status": "PASSED",
-      "startMs": 24879,
-      "endMs": 26843
+      "startMs": 43778,
+      "endMs": 48012
     },
     {
       "name": "Abrir el formulario para crear un caso",
       "status": "PASSED",
-      "startMs": 26843,
-      "endMs": 29082
+      "startMs": 48012,
+      "endMs": 51984
     },
     {
       "name": "Completar los datos del escenario",
       "status": "PASSED",
-      "startMs": 29082,
-      "endMs": 40124
+      "startMs": 51984,
+      "endMs": 78653
     },
     {
       "name": "Seleccionar prioridad alta",
       "status": "PASSED",
-      "startMs": 40124,
-      "endMs": 43578
+      "startMs": 78653,
+      "endMs": 87202
     },
     {
       "name": "Guardar y comprobar el caso",
       "status": "PASSED",
-      "startMs": 43578,
-      "endMs": 45864
+      "startMs": 87202,
+      "endMs": 92058
     }
   ],
   "createdCase": {

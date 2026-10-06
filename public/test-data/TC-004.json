@@ -2,56 +2,56 @@
   "id": "TC-004",
   "title": "Crear caso de prueba",
   "status": "PASSED",
-  "startedAt": 1790581553170,
-  "durationMs": 43148,
+  "startedAt": 1791204184647,
+  "durationMs": 20659,
   "steps": [
     {
       "name": "Abrir login",
       "status": "PASSED",
-      "startMs": 3,
-      "endMs": 2195
+      "startMs": 0,
+      "endMs": 1739
     },
     {
       "name": "Introducir credenciales",
       "status": "PASSED",
-      "startMs": 2195,
-      "endMs": 8334
+      "startMs": 1739,
+      "endMs": 5542
     },
     {
       "name": "Iniciar sesión",
       "status": "PASSED",
-      "startMs": 8334,
-      "endMs": 11190
+      "startMs": 5542,
+      "endMs": 8196
     },
     {
       "name": "Abrir Test Cases",
       "status": "PASSED",
-      "startMs": 11190,
-      "endMs": 14008
+      "startMs": 8196,
+      "endMs": 9948
     },
     {
       "name": "Abrir formulario",
       "status": "PASSED",
-      "startMs": 14008,
-      "endMs": 16690
+      "startMs": 9948,
+      "endMs": 11799
     },
     {
       "name": "Completar caso",
       "status": "PASSED",
-      "startMs": 16690,
-      "endMs": 32643
+      "startMs": 11799,
+      "endMs": 15285
     },
     {
       "name": "Seleccionar prioridad",
       "status": "PASSED",
-      "startMs": 32643,
-      "endMs": 37827
+      "startMs": 15285,
+      "endMs": 18357
     },
     {
       "name": "Guardar caso",
       "status": "PASSED",
-      "startMs": 37827,
-      "endMs": 43148
+      "startMs": 18357,
+      "endMs": 20659
     }
   ],
   "createdCase": {

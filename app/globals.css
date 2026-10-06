@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* Colores base compartidos por todas las rutas de la aplicación. */
 :root {
   --background: #07111f;
   --foreground: #f8fafc;
@@ -30,6 +31,7 @@ a,
 input,
 textarea,
 select {
+  /* Transiciones comunes para que los estados interactivos sean consistentes. */
   transition:
     border-color 160ms ease,
     background-color 160ms ease,

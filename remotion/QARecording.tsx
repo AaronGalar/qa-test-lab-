@@ -13,16 +13,16 @@ export interface QARecordingProps {
   title?: string;
   status?: "PASSED" | "FAILED";
   durationSeconds?: number;
+  steps?: { name: string; startMs: number; endMs: number }[];
   videoSrc?: string;
 }
 
-// Pasos detallados que van cambiando según avance el vídeo
-const STEPS = [
-  { frameStart: 0, frameEnd: 90, label: "1. Accediendo a la pantalla de login" },
-  { frameStart: 90, frameEnd: 180, label: "2. Introduciendo credenciales de usuario" },
-  { frameStart: 180, frameEnd: 270, label: "3. Iniciando sesión y cargando el panel" },
-  { frameStart: 270, frameEnd: 360, label: "4. Navegando al módulo de 'Casos de prueba'" },
-  { frameStart: 360, frameEnd: 450, label: "5. Cambiando el estado del caso de prueba" },
+const DEFAULT_STEPS = [
+  { name: "Accediendo a la pantalla de login", startMs: 0, endMs: 3000 },
+  { name: "Introduciendo las credenciales", startMs: 3000, endMs: 6000 },
+  { name: "Iniciando sesión", startMs: 6000, endMs: 9000 },
+  { name: "Abriendo el módulo de casos", startMs: 9000, endMs: 12000 },
+  { name: "Guardando el caso de prueba", startMs: 12000, endMs: 15000 },
 ];
 
 export const QARecording: React.FC<QARecordingProps> = ({
@@ -30,10 +30,12 @@ export const QARecording: React.FC<QARecordingProps> = ({
   title = "Cambiar estado de un caso de prueba",
   status = "PASSED",
   durationSeconds = 15.0,
+  steps = DEFAULT_STEPS,
   videoSrc = "recordings/video-TC-008.webm",
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const currentMs = (frame / fps) * 1000;
 
   // Animación suave de entrada
   const entrance = spring({
@@ -45,10 +47,10 @@ export const QARecording: React.FC<QARecordingProps> = ({
   const translateY = interpolate(entrance, [0, 1], [80, 0]);
   const isPassed = status === "PASSED";
 
-  // Identificar el paso activo
+  // El JSON de Playwright mide los pasos en milisegundos, igual que el tiempo del vídeo.
   const currentStep =
-    STEPS.find((s) => frame >= s.frameStart && frame < s.frameEnd)?.label ||
-    STEPS[STEPS.length - 1].label;
+    steps.find((step) => currentMs >= step.startMs && currentMs < step.endMs)
+      ?.name ?? steps[steps.length - 1]?.name ?? "Revisando el caso de prueba";
 
   return (
     <AbsoluteFill style={{ backgroundColor: "#07111f" }}>

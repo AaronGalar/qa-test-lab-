@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 export default function AIDemoPage() {
+  // El historial es estado porque cada nuevo mensaje debe actualizar la pantalla.
   const [messages, setMessages] = useState<
     { sender: "user" | "ai"; text: string }[]
   >([
@@ -15,7 +16,10 @@ export default function AIDemoPage() {
 
   const [input, setInput] = useState("");
   const [isThinking, setIsThinking] = useState(false);
+  const thinkingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const typingTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Respuesta fija para enseñar el flujo; esta demo no llama a un servicio de IA.
   const simulatedAIResponse =
     "Analizando tu aplicación... 🚀 He detectado 3 escenarios clave:\n\n" +
     "1. Validación de login con credenciales inválidas (Prioridad Alta).\n" +
@@ -23,6 +27,15 @@ export default function AIDemoPage() {
     "3. Inyección de caracteres especiales en formulario (Prioridad Alta).\n\n" +
     "¿Quieres que añada estos 3 casos automáticamente a tu biblioteca de pruebas?";
   const responseCharacters = Array.from(simulatedAIResponse);
+
+  // Cancelamos temporizadores pendientes si se abandona la página durante la demo.
+  useEffect(
+    () => () => {
+      if (thinkingTimer.current) clearTimeout(thinkingTimer.current);
+      if (typingTimer.current) clearInterval(typingTimer.current);
+    },
+    [],
+  );
 
   const handleSend = () => {
     if (!input.trim() || isThinking) return;
@@ -32,14 +45,16 @@ export default function AIDemoPage() {
     setInput("");
     setIsThinking(true);
 
-    setTimeout(() => {
+    thinkingTimer.current = setTimeout(() => {
+      thinkingTimer.current = null;
       setIsThinking(false);
       setMessages((prev) => [...prev, { sender: "ai", text: "" }]);
 
       let index = 0;
-      const interval = setInterval(() => {
+      typingTimer.current = setInterval(() => {
         if (index < responseCharacters.length) {
           const char = responseCharacters[index];
+          // La función de actualización recibe el historial más reciente de React.
           setMessages((prev) => {
             const updated = [...prev];
             const lastIndex = updated.length - 1;
@@ -51,7 +66,8 @@ export default function AIDemoPage() {
           });
           index++;
         } else {
-          clearInterval(interval);
+          if (typingTimer.current) clearInterval(typingTimer.current);
+          typingTimer.current = null;
         }
       }, 25);
     }, 1500);

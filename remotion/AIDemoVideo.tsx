@@ -21,6 +21,7 @@ const SEND_FRAME = 112;
 const THINKING_START = 142;
 const RESPONSE_START = 210;
 
+// Avatar reutilizable para cada mensaje generado en la simulación.
 const AIAvatar: React.FC = () => (
   <div
     style={{
@@ -46,6 +47,7 @@ export const AIDemoVideo: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
+  // Los offsets de frame controlan cuándo aparece el texto y el estado de espera.
   const entrance = spring({
     frame,
     fps,

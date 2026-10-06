@@ -74,6 +74,7 @@ export const RecordedFirstUseTutorial: React.FC<
 > = ({ testId, title, status, durationMs, steps, videoSrc }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  // La grabación y los pasos usan milisegundos para compartir la misma línea temporal.
   const currentMs = Math.min((frame / fps) * 1000, durationMs);
   const activeIndex = steps.findIndex(
     (step) => currentMs >= step.startMs && currentMs < step.endMs,

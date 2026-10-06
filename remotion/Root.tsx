@@ -4,9 +4,11 @@ import { Composition } from "remotion";
 import tasksMetadata from "../public/test-data/TAREAS.json";
 import tutorialMetadata from "../public/test-data/TUTORIAL-IA.json";
 import { AIDemoVideo } from "./AIDemoVideo";
+import { QARecording } from "./QARecording";
 import { RecordedFirstUseTutorial } from "./RecordedFirstUseTutorial";
 import { QATutorial } from "./QATutorial";
 
+// El margen permite cerrar el montaje después del último paso.
 const tasksDurationInFrames = Math.ceil(
   ((tasksMetadata.durationMs + 1200) / 1000) * 30,
 );
@@ -32,6 +34,7 @@ const tutorialSteps = tutorialMetadata.steps.map((step) => ({
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      {/* Composiciones estáticas para los tutoriales de ejemplo. */}
       <Composition
         id="QATutorial"
         component={QATutorial}
@@ -47,6 +50,23 @@ export const RemotionRoot: React.FC = () => {
         fps={30}
         width={1920}
         height={1080}
+      />
+      {/* Los valores reales del caso y su cronología llegan desde el script de render. */}
+      <Composition
+        id="QARecording"
+        component={QARecording}
+        durationInFrames={900}
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={{
+          testId: "TC-004",
+          title: "Crear caso de prueba",
+          status: "PASSED",
+          durationSeconds: 15,
+          steps: [],
+          videoSrc: "recordings/video.webm",
+        }}
       />
       <Composition
         id="TasksWalkthrough"

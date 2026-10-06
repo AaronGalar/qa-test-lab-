@@ -50,7 +50,7 @@ Para un puntero que salta o una escritura que parece aparecer por bloques, el pr
 - Compruebo como se envia cada caracter y cuanto dura la pausa entre caracteres.
 - Repito el test y reviso la grabacion WebM antes de renderizar el MP4.
 
-Solo ajusto `remotion/QARecording.tsx` si el salto se debe al movimiento de camara, al zoom o a una transicion superpuesta. Ajusto `remotion/Root.tsx` cuando la grabacion ya dura mas y hace falta dar cabida a todo el flujo y al cierre.
+Solo ajusto `remotion/QARecording.tsx` si el salto se debe a la presentacion visual o a una transicion superpuesta. Ajusto `remotion/Root.tsx` cuando se anade o modifica una composicion.
 
 En la correccion mas reciente del puntero y la escritura, los archivos fuente modificados fueron:
 

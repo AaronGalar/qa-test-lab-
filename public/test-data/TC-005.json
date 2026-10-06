@@ -2,44 +2,44 @@
   "id": "TC-005",
   "title": "Cancelar creación de caso",
   "status": "PASSED",
-  "startedAt": 1790333772084,
-  "durationMs": 10632,
+  "startedAt": 1791204123218,
+  "durationMs": 19278,
   "steps": [
     {
       "name": "Abrir login",
       "status": "PASSED",
-      "startMs": 0,
-      "endMs": 2073
+      "startMs": 13,
+      "endMs": 1457
     },
     {
       "name": "Introducir credenciales",
       "status": "PASSED",
-      "startMs": 2073,
-      "endMs": 4644
+      "startMs": 1458,
+      "endMs": 6859
     },
     {
       "name": "Iniciar sesión",
       "status": "PASSED",
-      "startMs": 4644,
-      "endMs": 6821
+      "startMs": 6859,
+      "endMs": 10309
     },
     {
       "name": "Abrir Test Cases",
       "status": "PASSED",
-      "startMs": 6821,
-      "endMs": 8092
+      "startMs": 10309,
+      "endMs": 13541
     },
     {
       "name": "Abrir formulario",
       "status": "PASSED",
-      "startMs": 8092,
-      "endMs": 9346
+      "startMs": 13541,
+      "endMs": 16588
     },
     {
       "name": "Cancelar sin guardar",
       "status": "PASSED",
-      "startMs": 9346,
-      "endMs": 10632
+      "startMs": 16588,
+      "endMs": 19277
     }
   ]
 }
