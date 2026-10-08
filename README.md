@@ -76,13 +76,17 @@ Abre [http://localhost:3000](http://localhost:3000). Para entrar en la demo:
 ## Conectar el backend FastAPI
 
 El frontend centraliza las llamadas HTTP y los tipos de la API en `lib/api/`.
-Preguntas y casos de prueba se guardan en el backend FastAPI y SQLite:
+Las preguntas, tareas y casos de prueba se guardan en FastAPI y SQLite:
 
-| Método | Endpoint          | Contrato                                                                  |
-| ------ | ----------------- | ------------------------------------------------------------------------- |
-| `GET`  | `/api/preguntas`  | Devuelve una lista de objetos `{ "id": 1, "texto": "..." }`.             |
-| `POST` | `/api/preguntas`  | Recibe `{ "texto": "..." }` y devuelve la pregunta creada.               |
-| `GET`  | `/api/test-cases` | Devuelve la lista de casos de prueba guardados.                            |
+| Método | Endpoint | Contrato |
+| --- | --- | --- |
+| `GET` | `/api/preguntas` | Devuelve preguntas guardadas. |
+| `POST` | `/api/preguntas` | Recibe `{ "texto": "..." }` y devuelve la pregunta creada. |
+| `GET` | `/api/tareas` | Devuelve tareas con `id`, `texto` y `completada`. |
+| `POST` | `/api/tareas` | Recibe `texto` y opcionalmente `completada`; devuelve la tarea creada. |
+| `PATCH` | `/api/tareas/{id}` | Recibe `completada` y actualiza la tarea. |
+| `DELETE` | `/api/tareas/{id}` | Elimina la tarea indicada. |
+| `GET` | `/api/test-cases` | Devuelve la lista de casos de prueba guardados. |
 | `POST` | `/api/test-cases` | Recibe `title`, `description`, `priority` y `status`; el backend asigna el ID. |
 | `PATCH` | `/api/test-cases/{id}` | Actualiza el estado del caso. |
 | `DELETE` | `/api/test-cases/{id}` | Elimina el caso de prueba. |
@@ -142,7 +146,7 @@ app/                  Rutas y componentes compartidos de Next.js
   faq/                Preguntas y ejemplo de props
 lib/api/              Cliente HTTP y funciones tipadas para FastAPI
 tests/                Pruebas Playwright y recopilador de métricas
-../backend/           API FastAPI y base de datos SQLite (carpeta hermana)
+backend/              API FastAPI y base de datos SQLite
 public/recordings/    Grabaciones fuente para los tutoriales
 public/test-data/     Cronologías QA utilizadas por Remotion
 remotion/             Composiciones de vídeo reutilizables
@@ -153,8 +157,8 @@ docs/                 Guías de trabajo y creación de vídeos QA
 
 ## Documentación
 
-- [Guía para aprender frontend y backend paso a paso](README.aprendizaje.md)
-- Ejecuta `npx playwright test --project=chromium tests/app-basics.spec.ts tests/ai-demo.spec.ts tests/login.spec.ts` para validar los flujos básicos sin recorrer todos los navegadores.
+- `npm run test:tareas` prueba la creación, actualización y eliminación de tareas.
+- `npx playwright test --project=chromium tests/app-basics.spec.ts tests/ai-demo.spec.ts tests/login.spec.ts` valida los flujos básicos sin recorrer todos los navegadores.
 - [Guía práctica para crear vídeos QA](docs/GUIA-CREAR-VIDEOS-QA.md)
 - [Guía para modificar vídeos QA](docs/GUIA-TRABAJO-MODIFICAR-VIDEOS-QA.md)
 - [Playbook de IA para vídeos QA](docs/PLAYBOOK-IA-VIDEOS-QA.md)
