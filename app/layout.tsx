@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "QA Test Lab",
-  description: "Un laboratorio visual para practicar testing y aprender React.",
+  description: "Un laboratorio visual para practicar QA y testing.",
 };
 
 // Layout es el marco común que Next.js utiliza para todas las rutas de la app.

@@ -1,70 +1,102 @@
 // Le dice a Next.js que este componente usa funciones del navegador (interacción, estados en vivo)
 "use client";
 
-// Importamos useState desde React para crear la "memoria" de nuestra aplicación
-import { useState, type FormEvent } from "react";
-// Importamos Link de Next.js para navegar entre páginas sin recargar la pantalla
+import { useState, useEffect, type FormEvent } from "react";
 import Link from "next/link";
+import {
+  alternarCompletada as alternarCompletadaEnApi,
+  crearTarea,
+  eliminarTarea as eliminarTareaEnApi,
+  obtenerTareas,
+  type Tarea,
+} from "@/lib/api/tareas";
 
-// INTERFAZ: Define la estructura o modelo de datos que DEBE tener cada tarea en TypeScript
-interface Tarea {
-  id: number;          // Un identificador único (ej: 171100239)
-  texto: string;       // El texto de la tarea
-  completada?: boolean; // El signo '?' significa opcional, pero indica si la tarea está lista (true/false)
-}
-
-export default function TasksPage() {
-  // ESTADO 1: Guarda el texto que el usuario está escribiendo en el <input>
+export default function TareasPage() {
+  const [tareas, setTareas] = useState<Tarea[]>([]);
   const [textoTarea, setTextoTarea] = useState("");
+  const [cargando, setCargando] = useState(true);
+  const [guardando, setGuardando] = useState(false);
+  const [actualizandoId, setActualizandoId] = useState<number | null>(null);
+  const [eliminandoId, setEliminandoId] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  // ESTADO 2: Guarda la lista completa de tareas.
-  // <Tarea[]> indica a TypeScript que este arreglo solo guardará objetos que sigan la interfaz Tarea
-  const [listaTareas, setTareas] = useState<Tarea[]>([]);
+  useEffect(() => {
+    let isCurrent = true;
 
-  // FUNCIÓN 1: Añadir una tarea al enviar el formulario, también con la tecla Enter.
-  const agregarTarea = (event: FormEvent<HTMLFormElement>) => {
+    async function cargarDatos() {
+      try {
+        const datos = await obtenerTareas();
+        if (isCurrent) setTareas(datos);
+      } catch (err: unknown) {
+        if (isCurrent) {
+          setError(
+            err instanceof Error ? err.message : "Error al cargar las tareas",
+          );
+        }
+      } finally {
+        if (isCurrent) setCargando(false);
+      }
+    }
+
+    void cargarDatos();
+    return () => {
+      isCurrent = false;
+    };
+  }, []);
+
+  async function agregarTarea(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    // .trim() quita los espacios al inicio y al final.
-    // Si la cadena queda vacía "", el 'return' detiene la función y no añade nada.
-    if (textoTarea.trim() === "") return;
+    const texto = textoTarea.trim();
+    if (!texto) return;
 
-    // Construimos el nuevo objeto de tarea siguiendo la interfaz
-    const nuevaTarea: Tarea = {
-      id: Date.now(),      // Genera un número único usando los milisegundos de la fecha/hora actual
-      texto: textoTarea.trim(),
-      completada: false,   // Por defecto, toda tarea nueva nace desmarcada
-    };
+    setError(null);
+    setGuardando(true);
+    try {
+      const nuevaTarea = await crearTarea(texto);
+      setTareas((actuales) => [...actuales, nuevaTarea]);
+      setTextoTarea("");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Error al crear la tarea");
+    } finally {
+      setGuardando(false);
+    }
+  }
 
-    // Actualizamos la lista de tareas.
-    // [...listatareas, nuevaTarea] usa el operador 'spread' (...):
-    // Copia todas las tareas anteriores y coloca la nueva al final del arreglo.
-    setTareas((tareasActuales) => [...tareasActuales, nuevaTarea]);
+  async function alternarTarea(tarea: Tarea) {
+    setError(null);
+    setActualizandoId(tarea.id);
+    try {
+      const tareaActualizada = await alternarCompletadaEnApi(
+        tarea.id,
+        !tarea.completada,
+      );
+      setTareas((actuales) =>
+        actuales.map((actual) =>
+          actual.id === tarea.id ? tareaActualizada : actual,
+        ),
+      );
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : "Error al actualizar la tarea",
+      );
+    } finally {
+      setActualizandoId(null);
+    }
+  }
 
-    // Limpiamos el valor del estado del texto para que el <input> vuelva a quedar vacío
-    setTextoTarea("");
-  };
-
-  // FUNCIÓN 2: Marcar / Desmarcar tarea como completada
-  const alternarCompletada = (id: number) => {
-    // prevTareas es el valor más reciente de la lista
-    setTareas((tareasActuales) =>
-      // map() crea una lista nueva y solo reemplaza la tarea que coincide por ID.
-      tareasActuales.map((tarea) =>
-        // ¿Es esta la tarea que el usuario clickeó? (comparamos IDs)
-        tarea.id === id
-          ? { ...tarea, completada: !tarea.completada } // SÍ: Copia la tarea e invierte completada (true <-> false)
-          : tarea                                      // NO: Deja la tarea tal cual está
-      )
-    );
-  };
-
-  // FUNCIÓN 3: Eliminar tarea
-  const eliminarTarea = (id: number) => {
-    // .filter() genera una nueva lista guardando solo los elementos que cumplan la condición
-    // (Conserva las tareas cuyos IDs sean DIFERENTES al id seleccionado)
-    setTareas((prevTareas) => prevTareas.filter((tarea) => tarea.id !== id));
-  };
+  async function borrarTarea(id: number) {
+    setError(null);
+    setEliminandoId(id);
+    try {
+      await eliminarTareaEnApi(id);
+      setTareas((actuales) => actuales.filter((tarea) => tarea.id !== id));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Error al eliminar la tarea");
+    } finally {
+      setEliminandoId(null);
+    }
+  }
 
   return (
     <main className="min-h-screen bg-[#07111f] p-6 text-white antialiased lg:p-10">
@@ -95,40 +127,59 @@ export default function TasksPage() {
           <button
             className="mt-4 rounded-lg bg-sky-500 px-4 py-2 text-slate-950 transition-colors hover:bg-sky-400"
             type="submit"
+            disabled={guardando}
           >
-            Añadir tarea
+            {guardando ? "Guardando..." : "Añadir tarea"}
           </button>
         </form>
-
+        {cargando && <p role="status">Cargando tareas...</p>}
+        {error && <p role="alert">{error}</p>}
         {/* LISTA: Renderizado dinámico de las tareas */}
         <ul className="mt-6 space-y-2">
-          {/* .map() recorre el arreglo 'listatareas' y genera un <li> por cada tarea */}
-          {listaTareas.map((tarea) => (
+          {/* .map() recorre el arreglo 'tareas' y genera un <li> por cada tarea */}
+          {!cargando && tareas.length === 0 && !error && (
+            <li className="rounded-lg border border-white/[0.08] bg-[#0b192b] px-4 py-3 text-slate-400">
+              No hay tareas todavía.
+            </li>
+          )}
+          {tareas.map((tarea) => (
             <li
               // key es Obligatorio en React para que sepa exactamente qué elemento modificar en el DOM
               key={tarea.id}
               className="bg-[#0b192b] border border-white/[0.08] px-4 py-2 rounded-lg flex justify-between items-center"
             >
               {/* Mostramos el texto de la tarea con un estilo condicional (tachado si está completada) */}
-              <span className={tarea.completada ? "line-through text-slate-500" : ""}>
+              <span
+                className={
+                  tarea.completada ? "line-through text-slate-500" : ""
+                }
+              >
                 {tarea.texto}
               </span>
 
               <div className="flex space-x-2">
                 {/* Botón para cambiar el estado a completado/no completado */}
                 <button
+                  type="button"
                   className="bg-sky-500 text-slate-950 px-3 py-1 rounded-lg hover:bg-sky-600 transition-colors"
-                  onClick={() => alternarCompletada(tarea.id)}
+                  onClick={() => void alternarTarea(tarea)}
+                  disabled={actualizandoId === tarea.id}
                 >
-                  {tarea.completada ? "Desmarcar" : "Marcar"}
+                  {actualizandoId === tarea.id
+                    ? "Guardando..."
+                    : tarea.completada
+                      ? "Desmarcar"
+                      : "Marcar"}
                 </button>
 
                 {/* Botón para borrar la tarea de la lista */}
                 <button
+                  type="button"
                   className="bg-red-500 text-slate-950 px-3 py-1 rounded-lg hover:bg-red-600 transition-colors"
-                  onClick={() => eliminarTarea(tarea.id)}
+                  onClick={() => void borrarTarea(tarea.id)}
+                  disabled={eliminandoId === tarea.id}
                 >
-                  Eliminar
+                  {eliminandoId === tarea.id ? "Eliminando..." : "Eliminar"}
                 </button>
               </div>
             </li>

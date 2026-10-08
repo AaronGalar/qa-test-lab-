@@ -7,7 +7,6 @@ const navigationItems = [
   { href: "/test-cases/ai-demo", number: "03", label: "Asistente IA" },
   { href: "/tareas", number: "04", label: "Lista de tareas" },
   { href: "/faq", number: "05", label: "Preguntas frecuentes" },
-  { href: "/aprender", number: "06", label: "Aprender React" },
 ] as const;
 
 type AppNavigationProps = {

@@ -36,7 +36,7 @@ test("Tareas - crear, completar y eliminar una tarea", async ({
     await recordStep("Validar tareas vacías", async () => {
       await page.getByPlaceholder("Añade aquí tu tarea").fill("   ");
       await page.getByRole("button", { name: "Añadir tarea" }).click();
-      await expect(page.getByRole("listitem")).toHaveCount(0);
+      await expect(page.getByText("No hay tareas todavía")).toBeVisible();
     });
 
     await recordStep("Añadir una tarea", async () => {
@@ -46,7 +46,7 @@ test("Tareas - crear, completar y eliminar una tarea", async ({
       await page.getByRole("button", { name: "Añadir tarea" }).click();
 
       const task = page.getByRole("listitem");
-      await expect(task).toHaveCount(1);
+      await expect(task).toBeVisible();
       await expect(task).toContainText("Preparar informe de pruebas");
       await expect(
         page.getByPlaceholder("Añade aquí tu tarea"),
@@ -69,7 +69,7 @@ test("Tareas - crear, completar y eliminar una tarea", async ({
       await page.getByRole("listitem").getByRole("button", {
         name: "Eliminar",
       }).click();
-      await expect(page.getByRole("listitem")).toHaveCount(0);
+      await expect(page.getByText("No hay tareas todavía")).toBeVisible();
     });
 
     if (isRecordingBrowser) metrics.finalize("PASSED");

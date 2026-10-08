@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/backend/venv/
 /.pnp
 .pnp.*
 .yarn/*
@@ -26,6 +27,9 @@
 # misc
 .DS_Store
 *.pem
+/backend/__pycache__/
+/backend/preguntas.db
+/backend/preguntas.db-*
 
 # debug
 npm-debug.log*
@@ -35,6 +39,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel

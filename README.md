@@ -25,9 +25,8 @@ QA Test Lab es una demo interactiva para recorrer tareas habituales de testing y
 | ------------------- | ---------------------------------------------------------------------------------------------- |
 | **Casos de prueba** | Crear casos, asignar prioridad, buscar, filtrar, cambiar estados y revisar métricas.           |
 | **Tareas**          | Añadir tareas, marcarlas como completadas y eliminarlas.                                       |
-| **Preguntas frecuentes** | Añadir preguntas a una lista local y practicar componentes con props.                       |
+| **Preguntas frecuentes** | Consultar y guardar preguntas en el backend FastAPI y su base de datos SQLite.                |
 | **Asistente QA**         | Explorar una conversación de ejemplo sobre escenarios de prueba. Las respuestas son simuladas. |
-| **Aprender React**       | Seguir retos paso a paso sobre estado, listas, formularios y pruebas E2E.                       |
 | **Vídeos QA**       | Grabar interacciones del navegador, medir pasos y renderizar tutoriales en MP4.                |
 
 <p align="center">
@@ -74,6 +73,49 @@ Abre [http://localhost:3000](http://localhost:3000). Para entrar en la demo:
 | `npm run render:qa`       | Renderiza TC-004 usando la grabación y métricas disponibles.             |
 | `npm run render:tareas`   | Ejecuta el test de tareas y renderiza `output/Tareas.mp4` con Remotion.   |
 
+## Conectar el backend FastAPI
+
+El frontend centraliza las llamadas HTTP y los tipos de la API en `lib/api/`.
+Preguntas y casos de prueba se guardan en el backend FastAPI y SQLite:
+
+| Método | Endpoint          | Contrato                                                                  |
+| ------ | ----------------- | ------------------------------------------------------------------------- |
+| `GET`  | `/api/preguntas`  | Devuelve una lista de objetos `{ "id": 1, "texto": "..." }`.             |
+| `POST` | `/api/preguntas`  | Recibe `{ "texto": "..." }` y devuelve la pregunta creada.               |
+| `GET`  | `/api/test-cases` | Devuelve la lista de casos de prueba guardados.                            |
+| `POST` | `/api/test-cases` | Recibe `title`, `description`, `priority` y `status`; el backend asigna el ID. |
+| `PATCH` | `/api/test-cases/{id}` | Actualiza el estado del caso. |
+| `DELETE` | `/api/test-cases/{id}` | Elimina el caso de prueba. |
+
+La primera vez que arranca el backend, añade los tres casos de demostración
+originales si la tabla está vacía. Los IDs nuevos se asignan consecutivamente
+(`TC-004`, `TC-005`, etc.) y no se reutilizan aunque se elimine un caso.
+Si ya existe en `preguntas.db` una tabla `test_cases` de la estructura antigua,
+la nueva API guarda sus casos en `qa_test_cases` y deja la tabla anterior intacta.
+
+Abre dos terminales en la raíz del repositorio. En la primera, prepara y arranca
+el backend:
+
+```powershell
+cd backend
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python -m uvicorn main:app --reload
+```
+
+En la segunda terminal, configura la URL del backend (el valor por defecto ya
+es `http://127.0.0.1:8000`) y arranca Next.js:
+
+```powershell
+Copy-Item .env.example .env.local
+npm run dev
+```
+
+`.env.local` es local y no se sube a Git. Si cambias la URL del backend,
+actualiza `NEXT_PUBLIC_API_URL`. FastAPI debe permitir el origen del frontend en
+CORS; el backend actual ya permite `http://localhost:3000`.
+
 ## Recorrido en vídeo
 
 El flujo combina tres piezas: Playwright ejecuta el escenario en Chromium, `tests/qa-metrics.ts` registra los tiempos y resultados de cada paso, y Remotion compone la grabación con rótulos sincronizados.
@@ -97,9 +139,10 @@ El recorrido de tareas puede probarse y renderizarse con `npm run render:tareas`
 ```text
 app/                  Rutas y componentes compartidos de Next.js
   components/         Navegación reutilizable
-  aprender/           Retos guiados de React y QA
   faq/                Preguntas y ejemplo de props
+lib/api/              Cliente HTTP y funciones tipadas para FastAPI
 tests/                Pruebas Playwright y recopilador de métricas
+../backend/           API FastAPI y base de datos SQLite (carpeta hermana)
 public/recordings/    Grabaciones fuente para los tutoriales
 public/test-data/     Cronologías QA utilizadas por Remotion
 remotion/             Composiciones de vídeo reutilizables
@@ -110,12 +153,15 @@ docs/                 Guías de trabajo y creación de vídeos QA
 
 ## Documentación
 
-- Abre `/aprender` en la aplicación para seguir ejercicios guiados basados en QA Test Lab.
-- Ejecuta `npx playwright test --project=chromium tests/learning.spec.ts tests/ai-demo.spec.ts tests/login.spec.ts` para validar la guía y los flujos básicos sin recorrer todos los navegadores.
+- [Guía para aprender frontend y backend paso a paso](README.aprendizaje.md)
+- Ejecuta `npx playwright test --project=chromium tests/app-basics.spec.ts tests/ai-demo.spec.ts tests/login.spec.ts` para validar los flujos básicos sin recorrer todos los navegadores.
 - [Guía práctica para crear vídeos QA](docs/GUIA-CREAR-VIDEOS-QA.md)
 - [Guía para modificar vídeos QA](docs/GUIA-TRABAJO-MODIFICAR-VIDEOS-QA.md)
 - [Playbook de IA para vídeos QA](docs/PLAYBOOK-IA-VIDEOS-QA.md)
 
 ## Alcance de la demo
 
-Este proyecto es un prototipo frontend: no conecta con una API ni una base de datos, y los cambios en los casos no persisten al recargar. El inicio de sesión y el asistente de IA también son simulaciones locales; las credenciales de arriba son exclusivamente para esta demo.
+Las preguntas frecuentes y los casos de prueba se leen y guardan en el backend
+FastAPI y SQLite de `backend/`. Las tareas también se guardan en ese backend y
+persisten al recargar. El inicio de sesión y el asistente de IA son
+simulaciones; las credenciales de arriba son exclusivamente para esta demo.

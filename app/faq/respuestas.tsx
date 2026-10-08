@@ -1,26 +1,26 @@
-// Las props describen los datos que el componente padre le entrega al componente hijo.
+import type { Pregunta } from "@/lib/api/preguntas";
+
 type RespuestasProps = {
-  preguntas: string[];
+  preguntas: Pregunta[];
 };
 
-// El componente recibe "preguntas" desde el archivo principal
 export default function Respuestas({ preguntas }: RespuestasProps) {
   if (preguntas.length === 0) {
     return (
       <p className="mt-8 text-center text-sm text-slate-500">
-        Tus preguntas aparecerán aquí.
+        Todavía no hay preguntas guardadas.
       </p>
     );
   }
 
   return (
-    <ul className="mt-8 space-y-2 max-w-md mx-auto">
-      {preguntas.map((item, index) => (
+    <ul className="mx-auto mt-8 max-w-md space-y-2">
+      {preguntas.map((pregunta) => (
         <li
-          key={`${item}-${index}`}
-          className="bg-[#0b192b] border border-white/10 p-3 rounded text-left"
+          key={pregunta.id}
+          className="rounded border border-white/10 bg-[#0b192b] p-3 text-left"
         >
-          ❓ {item}
+          ❓ {pregunta.texto}
         </li>
       ))}
     </ul>
