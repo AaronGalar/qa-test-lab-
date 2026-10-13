@@ -144,7 +144,7 @@ test("TC-004 - Crear caso de prueba", async ({ page }, testInfo) => {
     if (isRecordingBrowser) await installRecordingCursor();
 
     await metrics.recordStep("Abrir login", async () => {
-      await page.goto("http://localhost:3000/login");
+      await page.goto("/login");
       await expect(page).toHaveURL(/\/login$/);
       if (isRecordingBrowser) await page.waitForTimeout(800);
     });

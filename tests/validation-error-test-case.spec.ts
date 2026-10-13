@@ -122,7 +122,7 @@ test("TC-007 - Validar campos obligatorios al crear caso", async ({ page }, test
     await installRecordingCursor();
 
     await metrics.recordStep("Abrir login", async () => {
-      await page.goto("http://localhost:3000/login");
+      await page.goto("/login");
       await expect(page).toHaveURL(/\/login$/);
       await page.waitForTimeout(800);
     });

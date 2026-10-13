@@ -77,7 +77,7 @@ test("TC-005 - Cancelar creación de caso", async ({ page }, testInfo) => {
   try {
     await installRecordingCursor();
     await metrics.recordStep("Abrir login", async () => {
-      await page.goto("http://localhost:3000/login");
+      await page.goto("/login");
       await expect(page).toHaveURL(/\/login$/);
     });
 

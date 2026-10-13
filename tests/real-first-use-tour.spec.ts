@@ -130,7 +130,7 @@ test("Tutorial real - desde el login hasta guardar un escenario QA", async ({
     await metrics.recordStep(
       "Abrir la pantalla de inicio de sesión",
       async () => {
-        await page.goto("http://localhost:3000/login");
+        await page.goto("/login");
         await expect(
           page.getByRole("heading", { name: "QA Test Lab" }),
         ).toBeVisible();

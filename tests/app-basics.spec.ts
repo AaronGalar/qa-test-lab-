@@ -74,7 +74,7 @@ test("el FAQ lee y crea preguntas en el backend", async ({
 }) => {
   let payload: { texto: string } | undefined;
 
-  await page.route("http://localhost:8000/api/preguntas", async (route) => {
+  await page.route("**/api/preguntas", async (route) => {
     if (route.request().method() === "GET") {
       await route.fulfill({
         json: [{ id: 1, texto: "Pregunta ya guardada" }],

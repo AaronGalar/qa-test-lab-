@@ -1,5 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const port = process.env.PORT ?? "3000";
+const baseURL = `http://localhost:${port}`;
+
 // Los vídeos de las pruebas se crean solo en Chromium para evitar duplicados.
 export default defineConfig({
   testDir: "./tests",
@@ -9,7 +12,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? "line" : "html",
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL,
     trace: "on-first-retry",
     viewport: { width: 1920, height: 1080 },
     deviceScaleFactor: 1,
@@ -41,8 +44,8 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: "npm run dev",
-    url: "http://localhost:3000",
+    command: `npm run start -- --port ${port}`,
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
   },
 });

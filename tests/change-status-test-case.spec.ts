@@ -143,7 +143,7 @@ test("TC-008 - Cambiar estado de un caso de prueba", async ({
     await installRecordingCursor();
 
     await metrics.recordStep("Abrir login", async () => {
-      await page.goto("http://localhost:3000/login");
+      await page.goto("/login");
       await expect(page).toHaveURL(/\/login$/);
       await page.waitForTimeout(600);
     });
