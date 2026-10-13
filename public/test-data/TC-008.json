@@ -1,39 +1,39 @@
 {
   "id": "TC-008",
   "title": "Cambiar estado de un caso de prueba",
-  "status": "PASSED",
-  "startedAt": 1791204143354,
-  "durationMs": 40981,
+  "status": "FAILED",
+  "startedAt": 1791888244431,
+  "durationMs": 29796,
   "steps": [
     {
       "name": "Abrir login",
       "status": "PASSED",
-      "startMs": 2,
-      "endMs": 2157
+      "startMs": 7,
+      "endMs": 2568
     },
     {
       "name": "Introducir credenciales",
       "status": "PASSED",
-      "startMs": 2158,
-      "endMs": 12335
+      "startMs": 2568,
+      "endMs": 7743
     },
     {
       "name": "Iniciar sesión",
       "status": "PASSED",
-      "startMs": 12335,
-      "endMs": 17523
+      "startMs": 7743,
+      "endMs": 11103
     },
     {
       "name": "Abrir Test Cases",
       "status": "PASSED",
-      "startMs": 17523,
-      "endMs": 23596
+      "startMs": 11103,
+      "endMs": 14763
     },
     {
       "name": "Cambiar estado del primer caso",
-      "status": "PASSED",
-      "startMs": 23596,
-      "endMs": 40981
+      "status": "FAILED",
+      "startMs": 14763,
+      "endMs": 29795
     }
   ]
 }

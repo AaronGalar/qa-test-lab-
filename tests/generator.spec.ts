@@ -47,6 +47,9 @@ test("genera una vista previa y guarda solo los escenarios seleccionados", async
   });
 
   await page.goto("/test-cases/generador");
+  
+  // Selección explícita para asegurar que el botón se habilite en todos los navegadores
+  await page.getByLabel("Tipo de funcionalidad").selectOption("login");
   await page.getByLabel("Nombre de la funcionalidad").fill("Acceso de clientes");
   await page.getByRole("button", { name: "Generar escenarios" }).click();
 
@@ -94,6 +97,9 @@ test("muestra el error del backend si no puede generar escenarios", async ({
   });
 
   await page.goto("/test-cases/generador");
+  
+  // Selección explícita para evitar que el botón quede deshabilitado en WebKit
+  await page.getByLabel("Tipo de funcionalidad").selectOption("login");
   await page.getByLabel("Nombre de la funcionalidad").fill("Acceso");
   await page.getByRole("button", { name: "Generar escenarios" }).click();
 

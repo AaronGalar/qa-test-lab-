@@ -1,88 +1,69 @@
 {
   "id": "TUTORIAL-IA",
-  "title": "Primer uso de QA Test Lab y el asistente de IA",
+  "title": "Primer uso de QA Test Lab y el generador de escenarios",
   "status": "PASSED",
-  "startedAt": 1791204210595,
-  "durationMs": 93860,
+  "startedAt": 1791898221835,
+  "durationMs": 39372,
   "steps": [
     {
       "name": "Abrir la pantalla de inicio de sesión",
       "status": "PASSED",
-      "startMs": 7,
-      "endMs": 1535
+      "startMs": 9,
+      "endMs": 2248
     },
     {
       "name": "Introducir las credenciales de demostración",
       "status": "PASSED",
-      "startMs": 1535,
-      "endMs": 9859
+      "startMs": 2248,
+      "endMs": 8094
     },
     {
       "name": "Iniciar sesión",
       "status": "PASSED",
-      "startMs": 9859,
-      "endMs": 13562
+      "startMs": 8094,
+      "endMs": 13164
     },
     {
       "name": "Abrir Casos de prueba",
       "status": "PASSED",
-      "startMs": 13562,
-      "endMs": 17871
+      "startMs": 13164,
+      "endMs": 17105
     },
     {
-      "name": "Abrir el Asistente IA",
+      "name": "Abrir el generador de escenarios",
       "status": "PASSED",
-      "startMs": 17871,
-      "endMs": 22258
+      "startMs": 17105,
+      "endMs": 20850
     },
     {
-      "name": "Escribir y enviar un prompt",
+      "name": "Elegir tipo y nombre de funcionalidad",
       "status": "PASSED",
-      "startMs": 22258,
-      "endMs": 34886
+      "startMs": 20850,
+      "endMs": 25481
     },
     {
-      "name": "Revisar los escenarios sugeridos",
+      "name": "Generar y revisar los escenarios",
       "status": "PASSED",
-      "startMs": 34886,
-      "endMs": 43778
+      "startMs": 25481,
+      "endMs": 28935
     },
     {
-      "name": "Volver a la biblioteca",
+      "name": "Seleccionar el escenario que se guardará",
       "status": "PASSED",
-      "startMs": 43778,
-      "endMs": 48012
+      "startMs": 28935,
+      "endMs": 29927
     },
     {
-      "name": "Abrir el formulario para crear un caso",
+      "name": "Guardar el escenario elegido",
       "status": "PASSED",
-      "startMs": 48012,
-      "endMs": 51984
+      "startMs": 29927,
+      "endMs": 33438
     },
     {
-      "name": "Completar los datos del escenario",
+      "name": "Comprobar el caso en la biblioteca",
       "status": "PASSED",
-      "startMs": 51984,
-      "endMs": 78653
-    },
-    {
-      "name": "Seleccionar prioridad alta",
-      "status": "PASSED",
-      "startMs": 78653,
-      "endMs": 87202
-    },
-    {
-      "name": "Guardar y comprobar el caso",
-      "status": "PASSED",
-      "startMs": 87202,
-      "endMs": 92058
+      "startMs": 33438,
+      "endMs": 37565
     }
-  ],
-  "createdCase": {
-    "id": "TC-004",
-    "title": "Validación de login con credenciales inválidas",
-    "description": "Escribe credenciales incorrectas y comprueba que el acceso se rechaza.",
-    "priority": "High",
-    "status": "PENDING"
-  }
+  ]
 }

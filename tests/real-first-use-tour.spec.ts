@@ -207,7 +207,8 @@ test("Tutorial real - desde el login hasta guardar un escenario QA", async ({
 
     await metrics.recordStep("Comprobar el caso en la biblioteca", async () => {
       await clickLikeUser(page.getByRole("link", { name: /volver a casos/i }));
-      await expect(page.getByText(CASE_TITLE)).toBeVisible();
+      // Añadido .first() para evitar la violación del modo estricto
+      await expect(page.getByText(CASE_TITLE).first()).toBeVisible();
     });
 
     await page.waitForTimeout(1800);

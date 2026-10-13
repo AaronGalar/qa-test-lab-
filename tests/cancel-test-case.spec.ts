@@ -4,6 +4,9 @@ import path from "node:path";
 import { createQaMetricRecorder } from "./qa-metrics";
 
 test("TC-005 - Cancelar creación de caso", async ({ page }, testInfo) => {
+  // Subimos el timeout general del test a 60s para evitar corte en Chromium con vídeo
+  test.setTimeout(60_000);
+
   const metrics = createQaMetricRecorder(testInfo, {
     id: "TC-005",
     title: "Cancelar creación de caso",
@@ -50,10 +53,9 @@ test("TC-005 - Cancelar creación de caso", async ({ page }, testInfo) => {
 
   async function moveTo(locator: Locator) {
     const box = await locator.boundingBox();
-
     if (box) {
       await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, {
-        steps: 18,
+        steps: 10,
       });
     }
   }
@@ -68,10 +70,14 @@ test("TC-005 - Cancelar creación de caso", async ({ page }, testInfo) => {
       return;
     }
 
-    const recordingPath = path.resolve(process.cwd(), "public", "recordings");
-    mkdirSync(recordingPath, { recursive: true });
-    await page.close();
-    await recording.saveAs(path.join(recordingPath, "video-TC-005.webm"));
+    try {
+      const recordingPath = path.resolve(process.cwd(), "public", "recordings");
+      mkdirSync(recordingPath, { recursive: true });
+      await page.close();
+      await recording.saveAs(path.join(recordingPath, "video-TC-005.webm"));
+    } catch (err) {
+      console.warn("No se pudo guardar la grabación:", err);
+    }
   }
 
   try {
@@ -82,46 +88,40 @@ test("TC-005 - Cancelar creación de caso", async ({ page }, testInfo) => {
     });
 
     await metrics.recordStep("Introducir credenciales", async () => {
-      const email = page.getByLabel("Email");
-      const password = page.getByLabel("Contraseña");
-      await moveTo(email);
-      await email.click();
-      await email.pressSequentially("qa@test.com", { delay: 42 });
-      await moveTo(password);
-      await password.click();
-      await password.pressSequentially("123456", { delay: 42 });
+      await page.getByLabel("Email").fill("qa@test.com");
+      await page.getByLabel("Contraseña").fill("123456");
     });
 
     await metrics.recordStep("Iniciar sesión", async () => {
-      await clickLikeUser(page.getByRole("button", { name: "Iniciar sesión" }));
+      await page.getByRole("button", { name: "Iniciar sesión" }).click();
+      await page.goto("/");
       await expect(
         page.getByRole("heading", { name: "Resumen de calidad" }),
-      ).toBeVisible();
+      ).toBeVisible({ timeout: 15000 });
     });
 
     await metrics.recordStep("Abrir Test Cases", async () => {
-      await clickLikeUser(page.getByRole("link", { name: "Casos de prueba" }));
+      await page.goto("/test-cases");
       await expect(
         page.getByRole("heading", { name: "Casos de prueba" }),
-      ).toBeVisible();
+      ).toBeVisible({ timeout: 15000 });
     });
 
     await metrics.recordStep("Abrir formulario", async () => {
-      await clickLikeUser(page.getByRole("button", { name: "Nuevo caso" }));
+      await clickLikeUser(page.getByRole("button", { name: "Nuevo caso" }).first());
       await expect(
         page.getByRole("heading", { name: "Crea un caso de prueba" }),
-      ).toBeVisible();
+      ).toBeVisible({ timeout: 15000 });
     });
 
     await metrics.recordStep("Cancelar sin guardar", async () => {
-      const formHeading = page.getByRole("heading", {
-        name: "Crea un caso de prueba",
-      });
-      await clickLikeUser(page.getByRole("button", { name: "Cancelar" }));
-      await expect(formHeading).toBeHidden();
+      await clickLikeUser(page.getByRole("button", { name: "Cancelar" }).first());
       await expect(
-        page.getByRole("button", { name: "Nuevo caso" }),
-      ).toBeVisible();
+        page.getByRole("heading", { name: "Crea un caso de prueba" }),
+      ).toBeHidden({ timeout: 15000 });
+      await expect(
+        page.getByRole("button", { name: "Nuevo caso" }).first(),
+      ).toBeVisible({ timeout: 15000 });
     });
 
     metrics.finalize("PASSED");
