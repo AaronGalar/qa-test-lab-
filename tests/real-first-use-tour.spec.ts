@@ -5,12 +5,10 @@ import { createQaMetricRecorder } from "./qa-metrics";
 
 const LOGIN_EMAIL = "qa@test.com";
 const LOGIN_PASSWORD = "123456";
-const PROMPT = "Genera tests para mi login";
-const CASE_TITLE = "Validación de login con credenciales inválidas";
-const CASE_DESCRIPTION =
-  "Escribe credenciales incorrectas y comprueba que el acceso se rechaza.";
+const FEATURE_NAME = "Acceso de clientes";
+const CASE_TITLE = `${FEATURE_NAME}: rechazo de credenciales incorrectas`;
 
-test("Tutorial real - desde el login hasta guardar un caso sugerido por IA", async ({
+test("Tutorial real - desde el login hasta guardar un escenario QA", async ({
   browser,
 }, testInfo) => {
   test.setTimeout(180_000);
@@ -43,14 +41,7 @@ test("Tutorial real - desde el login hasta guardar un caso sugerido por IA", asy
   const recording = page.video();
   const metrics = createQaMetricRecorder(testInfo, {
     id: "TUTORIAL-IA",
-    title: "Primer uso de QA Test Lab y el asistente de IA",
-    createdCase: {
-      id: "TC-004",
-      title: CASE_TITLE,
-      description: CASE_DESCRIPTION,
-      priority: "High",
-      status: "PENDING",
-    },
+    title: "Primer uso de QA Test Lab y el generador de escenarios",
   });
 
   async function installRecordingCursor() {
@@ -168,73 +159,55 @@ test("Tutorial real - desde el login hasta guardar un caso sugerido por IA", asy
       ).toBeVisible();
     });
 
-    await metrics.recordStep("Abrir el Asistente IA", async () => {
-      await clickLikeUser(page.getByRole("link", { name: "Asistente IA" }));
-      await expect(page.getByTestId("chat-input")).toBeVisible();
-      await expect(page.getByTestId("message-ai").first()).toContainText(
-        "asistente de QA con IA",
-      );
-    });
-
-    await metrics.recordStep("Escribir y enviar un prompt", async () => {
-      await typeLikeUser(page.getByTestId("chat-input"), PROMPT);
-      await clickLikeUser(page.getByTestId("send-button"));
-      await expect(page.getByTestId("message-user").last()).toContainText(
-        PROMPT,
-      );
-    });
-
-    await metrics.recordStep("Revisar los escenarios sugeridos", async () => {
-      const response = page.getByTestId("message-ai").last();
-      await expect(response).toContainText("Validación de login", {
-        timeout: 20_000,
-      });
-      await expect(response).toContainText("Prioridad Alta");
-      await expect(response).toContainText("Timeout de sesión");
-      await expect(response).toContainText("caracteres especiales");
-    });
-
-    await metrics.recordStep("Volver a la biblioteca", async () => {
-      await clickLikeUser(page.getByRole("link", { name: /volver a casos/i }));
-      await expect(
-        page.getByRole("heading", { name: "Casos de prueba" }),
-      ).toBeVisible();
-    });
-
-    await metrics.recordStep(
-      "Abrir el formulario para crear un caso",
-      async () => {
-        await clickLikeUser(page.getByRole("button", { name: /nuevo caso/i }));
-        await expect(
-          page.getByRole("heading", { name: "Crea un caso de prueba" }),
-        ).toBeVisible();
-      },
-    );
-
-    await metrics.recordStep("Completar los datos del escenario", async () => {
-      await typeLikeUser(page.getByLabel("Título"), CASE_TITLE);
-      await typeLikeUser(page.getByLabel("Descripción"), CASE_DESCRIPTION);
-    });
-
-    await metrics.recordStep("Seleccionar prioridad alta", async () => {
-      const priority = page.getByRole("button", { name: "Prioridad" });
-      await clickLikeUser(priority);
-      const priorityOptions = page.getByRole("listbox", {
-        name: "Niveles de prioridad",
-      });
-      await expect(priorityOptions).toBeVisible();
+    await metrics.recordStep("Abrir el generador de escenarios", async () => {
       await clickLikeUser(
-        priorityOptions.getByRole("option", { name: /Alta/ }),
+        page.getByRole("link", { name: "Generador de escenarios" }),
       );
-      await expect(priority).toContainText("Alta");
+      await expect(
+        page.getByRole("heading", { name: "Generador de escenarios QA" }),
+      ).toBeVisible();
     });
 
-    await metrics.recordStep("Guardar y comprobar el caso", async () => {
-      await clickLikeUser(page.getByRole("button", { name: "Guardar caso" }));
-      await expect(page.getByText(CASE_TITLE)).toBeVisible();
+    await metrics.recordStep("Elegir tipo y nombre de funcionalidad", async () => {
+      await page.getByLabel("Tipo de funcionalidad").selectOption("login");
+      await typeLikeUser(
+        page.getByLabel("Nombre de la funcionalidad"),
+        FEATURE_NAME,
+      );
+    });
+
+    await metrics.recordStep("Generar y revisar los escenarios", async () => {
+      await clickLikeUser(
+        page.getByRole("button", { name: "Generar escenarios" }),
+      );
       await expect(
-        page.getByText("Caso TC-004 guardado correctamente."),
+        page.getByRole("heading", { name: "Revisa las sugerencias" }),
       ).toBeVisible();
+      await expect(
+        page.getByRole("checkbox", {
+          name: `Seleccionar ${CASE_TITLE}`,
+        }),
+      ).toBeVisible();
+    });
+
+    await metrics.recordStep("Seleccionar el escenario que se guardará", async () => {
+      await page
+        .getByRole("checkbox", { name: `Seleccionar ${CASE_TITLE}` })
+        .check();
+    });
+
+    await metrics.recordStep("Guardar el escenario elegido", async () => {
+      await clickLikeUser(
+        page.getByRole("button", { name: "Guardar seleccionados (1)" }),
+      );
+      await expect(page.getByRole("status")).toContainText(
+        "1 caso guardado en la biblioteca.",
+      );
+    });
+
+    await metrics.recordStep("Comprobar el caso en la biblioteca", async () => {
+      await clickLikeUser(page.getByRole("link", { name: /volver a casos/i }));
+      await expect(page.getByText(CASE_TITLE)).toBeVisible();
     });
 
     await page.waitForTimeout(1800);

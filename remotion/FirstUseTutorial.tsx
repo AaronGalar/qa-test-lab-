@@ -9,22 +9,16 @@ import {
 
 const LOGIN_EMAIL = "qa@test.com";
 const LOGIN_PASSWORD = "123456";
-const PROMPT = "Genera tests para mi login";
-const CASE_TITLE = "Validación de login con credenciales inválidas";
+const FEATURE_NAME = "Acceso de clientes";
+const CASE_TITLE = `${FEATURE_NAME}: rechazo de credenciales incorrectas`;
 const CASE_DESCRIPTION =
-  "Escribe credenciales incorrectas y comprueba que el acceso se rechaza.";
-const AI_RESPONSE =
-  "Analizando tu aplicación... 🚀 He detectado 3 escenarios clave:\n\n" +
-  "1. Validación de login con credenciales inválidas (Prioridad Alta).\n" +
-  "2. Timeout de sesión tras 15 minutos de inactividad (Prioridad Media).\n" +
-  "3. Inyección de caracteres especiales en formulario (Prioridad Alta).\n\n" +
-  "¿Quieres que añada estos 3 casos automáticamente a tu biblioteca de pruebas?";
+  "Introducir una contraseña incorrecta y comprobar que se rechaza el acceso.";
 
 const TIMELINE = {
   loginEnd: 240,
   dashboardEnd: 405,
   casesEnd: 555,
-  chatEnd: 1170,
+  generatorEnd: 1170,
   saveEnd: 1590,
   tutorialEnd: 1680,
 };
@@ -63,32 +57,14 @@ const CASES_CURSOR: CursorPoint[] = [
   { frame: 115, x: 340, y: 410 },
 ];
 
-const CHAT_CURSOR: CursorPoint[] = [
+const GENERATOR_CURSOR: CursorPoint[] = [
   { frame: 0, x: 285, y: 356 },
-  { frame: 23, x: 920, y: 779 },
-  { frame: 29, x: 920, y: 779, click: true },
-  { frame: 80, x: 920, y: 779 },
-  { frame: 91, x: 1430, y: 779 },
-  { frame: 98, x: 1430, y: 779, click: true },
-  { frame: 150, x: 1510, y: 700 },
-];
-
-const SAVE_CURSOR: CursorPoint[] = [
-  { frame: 0, x: 1430, y: 779 },
-  { frame: 12, x: 1680, y: 185 },
-  { frame: 20, x: 1680, y: 185, click: true },
-  { frame: 42, x: 1680, y: 185 },
-  { frame: 68, x: 1650, y: 282 },
-  { frame: 76, x: 1650, y: 282, click: true },
-  { frame: 114, x: 1080, y: 450 },
-  { frame: 120, x: 1080, y: 450, click: true },
-  { frame: 214, x: 1080, y: 550 },
-  { frame: 220, x: 1080, y: 550, click: true },
-  { frame: 350, x: 650, y: 700 },
-  { frame: 358, x: 650, y: 700, click: true },
-  { frame: 380, x: 510, y: 780 },
-  { frame: 390, x: 510, y: 780, click: true },
-  { frame: 410, x: 760, y: 670 },
+  { frame: 23, x: 1100, y: 468 },
+  { frame: 29, x: 1100, y: 468, click: true },
+  { frame: 64, x: 1100, y: 560 },
+  { frame: 72, x: 1100, y: 560, click: true },
+  { frame: 120, x: 1100, y: 755 },
+  { frame: 128, x: 1100, y: 755, click: true },
 ];
 
 type GuideSceneProps = {
@@ -522,7 +498,10 @@ const LoginScreen: React.FC<{ frame: number }> = ({ frame }) => {
   );
 };
 
-type ActiveNav = "Resumen" | "Casos de prueba";
+type ActiveNav =
+  | "Resumen"
+  | "Casos de prueba"
+  | "Generador de escenarios";
 
 const AppHeader: React.FC = () => (
   <div
@@ -590,12 +569,12 @@ const AppHeader: React.FC = () => (
 
 const SideNav: React.FC<{
   active: ActiveNav;
-  focusOn?: ActiveNav | "Asistente IA";
+  focusOn?: ActiveNav;
 }> = ({ active, focusOn }) => {
-  const items: Array<{ label: ActiveNav | "Asistente IA"; number: string }> = [
+  const items: Array<{ label: ActiveNav; number: string }> = [
     { label: "Resumen", number: "01" },
     { label: "Casos de prueba", number: "02" },
-    { label: "Asistente IA", number: "03" },
+    { label: "Generador de escenarios", number: "03" },
   ];
 
   return (
@@ -649,7 +628,7 @@ const SideNav: React.FC<{
 
 const AppLayout: React.FC<{
   active: ActiveNav;
-  focusOn?: ActiveNav | "Asistente IA";
+  focusOn?: ActiveNav;
   children: React.ReactNode;
 }> = ({ active, focusOn, children }) => (
   <div
@@ -799,7 +778,9 @@ const CasesList: React.FC<{
   <AppLayout
     active="Casos de prueba"
     focusOn={
-      !isSaveTutorial && frame > 25 && frame < 150 ? "Asistente IA" : undefined
+      !isSaveTutorial && frame > 25 && frame < 150
+        ? "Generador de escenarios"
+        : undefined
     }
   >
     <div
@@ -1075,14 +1056,11 @@ const FormField: React.FC<{
   </div>
 );
 
-const ChatScreen: React.FC<{ frame: number }> = ({ frame }) => {
-  const typedPrompt = typeValue(PROMPT, frame, 34, 2);
-  const isSent = frame >= 98;
-  const thinking = frame >= 126 && frame < 194;
-  const responseCount = Math.min(
-    AI_RESPONSE.length,
-    Math.max(0, Math.floor((frame - 194) * 1.1)),
-  );
+const GeneratorScreen: React.FC<{ frame: number }> = ({ frame }) => {
+  const typedFeatureName = typeValue(FEATURE_NAME, frame, 30, 2);
+  const hasGenerated = frame >= 75;
+  const isSelected = frame >= 120;
+  const isSaved = frame >= 150;
 
   return (
     <div
@@ -1124,10 +1102,10 @@ const ChatScreen: React.FC<{ frame: number }> = ({ frame }) => {
           </div>
           <div>
             <div style={{ fontSize: 14, fontWeight: 700 }}>
-              QA Copilot AI (Simulación)
+                Generador de escenarios QA
             </div>
             <div style={{ marginTop: 3, color: colors.green, fontSize: 11 }}>
-              ● Modelo activo (Local)
+                ● Reglas del backend · sin IA
             </div>
           </div>
         </div>
@@ -1148,134 +1126,117 @@ const ChatScreen: React.FC<{ frame: number }> = ({ frame }) => {
           justifyContent: "space-between",
         }}
       >
-        <div style={{ display: "flex", flexDirection: "column", gap: 15 }}>
-          <ChatMessage text="¡Hola! Soy tu asistente de QA con IA. ¿En qué puedo ayudarte hoy a analizar o generar casos de prueba?" />
-          {isSent && <ChatMessage user text={PROMPT} />}
-          {thinking && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          <div>
+            <div style={{ fontSize: 25, fontWeight: 800 }}>
+              Generador de escenarios QA
+            </div>
+            <div style={{ marginTop: 6, color: colors.muted, fontSize: 13 }}>
+              El backend aplica reglas deterministas; no se usa IA.
+            </div>
+          </div>
+          <div
+            style={{
+              padding: 18,
+              border: `1px solid ${colors.border}`,
+              borderRadius: 12,
+              backgroundColor: colors.panel,
+            }}
+          >
+            <div style={{ color: colors.muted, fontSize: 12 }}>
+              Tipo de funcionalidad
+            </div>
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                color: colors.muted,
+                marginTop: 7,
+                padding: 11,
+                border: `1px solid ${colors.border}`,
+                borderRadius: 8,
                 fontSize: 13,
-                fontStyle: "italic",
               }}
             >
-              <ChatAvatar />
-              La IA está analizando tu petición...{" "}
-              <span style={{ color: colors.cyan }}>•••</span>
+              Inicio de sesión
+            </div>
+            <div
+              style={{
+                marginTop: 13,
+                color: colors.muted,
+                fontSize: 12,
+              }}
+            >
+              Nombre de la funcionalidad
+            </div>
+            <div
+              style={{
+                marginTop: 7,
+                padding: 11,
+                border: `1px solid ${colors.border}`,
+                borderRadius: 8,
+                color: typedFeatureName ? colors.text : "#64748b",
+                fontSize: 13,
+              }}
+            >
+              {typedFeatureName || "Ej.: Acceso de clientes"}
+              {frame >= 30 && frame < 30 + FEATURE_NAME.length * 2 && (
+                <span style={{ color: colors.cyan }}>▍</span>
+              )}
+            </div>
+            <div
+              style={{
+                marginTop: 14,
+                display: "inline-block",
+                padding: "10px 15px",
+                borderRadius: 8,
+                color: "#082032",
+                backgroundColor: colors.cyan,
+                fontSize: 12,
+                fontWeight: 800,
+              }}
+            >
+              Generar escenarios
+            </div>
+          </div>
+          {hasGenerated && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+              <div style={{ fontSize: 17, fontWeight: 700 }}>
+                Revisa las sugerencias
+              </div>
+              {[
+                "Acceso con credenciales válidas",
+                "Rechazo de credenciales incorrectas",
+                "Validación de campos obligatorios",
+              ].map((title, index) => (
+                <div
+                  key={title}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: 11,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: 9,
+                    backgroundColor: colors.panel,
+                    fontSize: 12,
+                  }}
+                >
+                  <span style={{ color: isSelected && index === 1 ? colors.green : colors.muted }}>
+                    {isSelected && index === 1 ? "☑" : "☐"}
+                  </span>
+                  {FEATURE_NAME}: {title}
+                  {isSaved && index === 1 && (
+                    <span style={{ marginLeft: "auto", color: colors.green }}>
+                      Guardado
+                    </span>
+                  )}
+                </div>
+              ))}
             </div>
           )}
-          {responseCount > 0 && (
-            <ChatMessage
-              text={`${AI_RESPONSE.slice(0, responseCount)}${responseCount < AI_RESPONSE.length ? "▍" : ""}`}
-              multiline
-            />
-          )}
-        </div>
-
-        <div
-          style={{
-            height: 56,
-            flexShrink: 0,
-            padding: "0 7px 0 17px",
-            display: "flex",
-            alignItems: "center",
-            borderRadius: 13,
-            border: `1px solid ${frame < 98 ? "rgba(56,189,248,0.75)" : colors.border}`,
-            backgroundColor: colors.panel,
-            boxShadow: frame < 98 ? "0 0 0 4px rgba(56,189,248,0.1)" : "none",
-          }}
-        >
-          <div
-            style={{
-              flex: 1,
-              color: typedPrompt ? colors.text : "#64748b",
-              fontSize: 13,
-            }}
-          >
-            {isSent
-              ? "Pídele a la IA que genere casos de prueba..."
-              : typedPrompt || "Pídele a la IA que genere casos de prueba..."}
-            {!isSent && frame >= 34 && (
-              <span style={{ color: colors.cyan }}>▍</span>
-            )}
-          </div>
-          <div
-            style={{
-              minWidth: 98,
-              height: 42,
-              padding: "0 13px",
-              borderRadius: 9,
-              display: "grid",
-              placeItems: "center",
-              color: isSent ? colors.muted : "#082032",
-              backgroundColor: isSent ? "#1e293b" : colors.cyan,
-              fontSize: 12,
-              fontWeight: 800,
-            }}
-          >
-            Enviar ✦
-          </div>
         </div>
       </div>
     </div>
   );
 };
-
-const ChatAvatar: React.FC = () => (
-  <div
-    style={{
-      width: 35,
-      height: 35,
-      flexShrink: 0,
-      display: "grid",
-      placeItems: "center",
-      borderRadius: 9,
-      border: "1px solid rgba(56,189,248,0.35)",
-      backgroundColor: "rgba(56,189,248,0.14)",
-      color: "#7dd3fc",
-      fontSize: 11,
-      fontWeight: 800,
-    }}
-  >
-    AI
-  </div>
-);
-
-const ChatMessage: React.FC<{
-  text: string;
-  user?: boolean;
-  multiline?: boolean;
-}> = ({ text, user = false, multiline = false }) => (
-  <div
-    style={{
-      display: "flex",
-      alignItems: "flex-start",
-      justifyContent: user ? "flex-end" : "flex-start",
-      gap: 12,
-    }}
-  >
-    {!user && <ChatAvatar />}
-    <div
-      style={{
-        maxWidth: user ? 690 : 800,
-        padding: "13px 17px",
-        borderRadius: 14,
-        border: user ? "none" : `1px solid ${colors.border}`,
-        backgroundColor: user ? colors.cyan : colors.panel,
-        color: user ? "#082032" : "#e2e8f0",
-        fontSize: 14,
-        lineHeight: 1.5,
-        whiteSpace: multiline ? "pre-line" : "normal",
-        fontWeight: user ? 700 : 400,
-      }}
-    >
-      {text}
-    </div>
-  </div>
-);
 
 const OutroScreen: React.FC = () => (
   <div
@@ -1313,9 +1274,9 @@ const OutroScreen: React.FC = () => (
       >
         {[
           "Inicia sesión con la cuenta de demostración.",
-          "Abre Casos de prueba y selecciona Asistente IA.",
-          "Escribe un prompt concreto y revisa los escenarios.",
-          "Guarda manualmente los casos que quieras conservar.",
+          "Abre el Generador de escenarios desde Casos de prueba.",
+          "Elige una plantilla y nombra la funcionalidad.",
+          "Revisa las sugerencias y guarda solo las que elijas.",
         ].map((item, index) => (
           <div
             key={item}
@@ -1390,8 +1351,8 @@ export const FirstUseTutorial: React.FC = () => {
       <GuideScene
         frame={localFrame}
         step={3}
-        title="Entra al Asistente IA"
-        description="En la navegación lateral, pulsa Asistente IA. El enlace está disponible también desde el resumen."
+        title="Entra al generador de escenarios"
+        description="En la navegación lateral, pulsa Generador de escenarios."
         route="/test-cases"
         cursorPoints={CASES_CURSOR}
       >
@@ -1400,43 +1361,34 @@ export const FirstUseTutorial: React.FC = () => {
     );
   }
 
-  if (frame < TIMELINE.chatEnd) {
+  if (frame < TIMELINE.generatorEnd) {
     const localFrame = frame - TIMELINE.casesEnd;
     return (
       <GuideScene
         frame={localFrame}
         step={4}
-        title="Escribe un prompt claro"
-        description="Prueba con: “Genera tests para mi login”. Espera el análisis y revisa los escenarios y sus prioridades."
-        route="/test-cases/ai-demo"
-        cursorPoints={CHAT_CURSOR}
+        title="Elige una plantilla y una funcionalidad"
+        description="Selecciona el tipo de flujo y escribe un nombre. FastAPI aplica reglas locales para devolver escenarios, sin conectarse a una IA."
+        route="/test-cases/generador"
+        cursorPoints={GENERATOR_CURSOR}
       >
-        <ChatScreen frame={localFrame} />
+        <GeneratorScreen frame={localFrame} />
       </GuideScene>
     );
   }
 
   if (frame < TIMELINE.saveEnd) {
-    const localFrame = frame - TIMELINE.chatEnd;
-    const isReturningToCases = localFrame < 40;
+    const localFrame = frame - TIMELINE.generatorEnd;
     return (
       <GuideScene
         frame={localFrame}
         step={5}
-        title="Guarda un caso"
-        description="La IA de esta demo sugiere escenarios, pero no los guarda automáticamente. Vuelve a Casos de prueba, pulsa + Nuevo caso, completa título, descripción y prioridad, y guarda."
-        route={isReturningToCases ? "/test-cases/ai-demo" : "/test-cases"}
-        cursorPoints={SAVE_CURSOR}
+        title="Guarda solo los escenarios elegidos"
+        description="Marca los casos que quieres conservar y guárdalos en la biblioteca. Los demás no se envían al backend."
+        route="/test-cases/generador"
+        cursorPoints={GENERATOR_CURSOR}
       >
-        {isReturningToCases ? (
-          <ChatScreen frame={620} />
-        ) : (
-          <CasesList
-            frame={localFrame - 40}
-            showForm={localFrame >= 104}
-            isSaveTutorial
-          />
-        )}
+        <GeneratorScreen frame={localFrame + 120} />
       </GuideScene>
     );
   }
@@ -1447,7 +1399,7 @@ export const FirstUseTutorial: React.FC = () => {
       frame={localFrame}
       step={5}
       title="¡Listo para empezar!"
-      description="Ya conoces el recorrido completo: inicia sesión, consulta la IA y guarda manualmente los escenarios que quieras conservar."
+      description="Ya conoces el recorrido completo: elige una plantilla, revisa los escenarios y guarda tu selección."
       route="tutorial-completado"
     >
       <OutroScreen />

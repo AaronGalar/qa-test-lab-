@@ -3,7 +3,6 @@ import React from "react";
 import { Composition } from "remotion";
 import tasksMetadata from "../public/test-data/TAREAS.json";
 import tutorialMetadata from "../public/test-data/TUTORIAL-IA.json";
-import { AIDemoVideo } from "./AIDemoVideo";
 import { QARecording } from "./QARecording";
 import { RecordedFirstUseTutorial } from "./RecordedFirstUseTutorial";
 import { QATutorial } from "./QATutorial";
@@ -39,14 +38,6 @@ export const RemotionRoot: React.FC = () => {
         id="QATutorial"
         component={QATutorial}
         durationInFrames={900} // 30 segundos a 30fps
-        fps={30}
-        width={1920}
-        height={1080}
-      />
-      <Composition
-        id="AIDemoVideo"
-        component={AIDemoVideo}
-        durationInFrames={720}
         fps={30}
         width={1920}
         height={1080}

@@ -4,9 +4,14 @@ import Link from "next/link";
 const navigationItems = [
   { href: "/", number: "01", label: "Resumen" },
   { href: "/test-cases", number: "02", label: "Casos de prueba" },
-  { href: "/test-cases/ai-demo", number: "03", label: "Asistente IA" },
+  {
+    href: "/test-cases/generador",
+    number: "03",
+    label: "Generador de escenarios",
+  },
   { href: "/tareas", number: "04", label: "Lista de tareas" },
   { href: "/faq", number: "05", label: "Preguntas frecuentes" },
+   { href: "/proyectos", number: "06", label: "Proyectos" },
 ] as const;
 
 type AppNavigationProps = {

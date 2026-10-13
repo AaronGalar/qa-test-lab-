@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean ,Date, Text
 from database import Base
+from datetime import date
 
 class PreguntaModel(Base):
     __tablename__ = "preguntas"
@@ -31,3 +32,26 @@ class TareaModel(Base):
     id = Column(Integer, primary_key=True, index=True)
     texto = Column(String, nullable=False)
     completada = Column(Boolean, default=False, nullable=False)
+
+class IncidenciaModel(Base):
+    __tablename__ = "incidencias"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=False)
+    status = Column(String, default="OPEN", nullable=False)
+    severity = Column(String, nullable=False)
+
+
+
+class ProyectoModel(Base):
+    __tablename__ = "proyectos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+
+    # ⚠️ ASEGÚRATE DE QUE ESTOS TRES CAMPOS ESTÉN AQUÍ:
+    fecha_inicio = Column(Date, nullable=True)
+    ultimo_testing = Column(Date, nullable=True)
+    detalles_testing = Column(Text, nullable=True)

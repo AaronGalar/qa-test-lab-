@@ -43,21 +43,18 @@ const STEP_GUIDANCE: Record<string, string> = {
   "Iniciar sesión": "Pulsa Iniciar sesión para abrir el espacio de trabajo.",
   "Abrir Casos de prueba":
     "Desde el menú lateral, entra en la biblioteca de casos.",
-  "Abrir el Asistente IA": "Abre el asistente desde el menú de navegación.",
-  "Escribir y enviar un prompt":
-    "Describe lo que quieres probar y envía la solicitud.",
-  "Revisar los escenarios sugeridos":
-    "Lee los escenarios propuestos y compara sus prioridades.",
-  "Volver a la biblioteca":
-    "Las sugerencias no se guardan solas; vuelve a la biblioteca para crear un caso.",
-  "Abrir el formulario para crear un caso":
-    "Selecciona Nuevo caso para registrar el escenario elegido.",
-  "Completar los datos del escenario":
-    "Añade un título claro y una descripción que se pueda ejecutar.",
-  "Seleccionar prioridad alta":
-    "Elige la prioridad adecuada para el impacto del escenario.",
-  "Guardar y comprobar el caso":
-    "Guarda el caso y confirma que aparece en la biblioteca.",
+  "Abrir el generador de escenarios":
+    "Abre el generador desde el menú de navegación.",
+  "Elegir tipo y nombre de funcionalidad":
+    "Selecciona la plantilla de login y escribe el nombre de la funcionalidad.",
+  "Generar y revisar los escenarios":
+    "Pide sugerencias al backend y revisa los casos propuestos.",
+  "Seleccionar el escenario que se guardará":
+    "Marca solo el caso que quieres añadir a la biblioteca.",
+  "Guardar el escenario elegido":
+    "Guarda la selección y comprueba la confirmación.",
+  "Comprobar el caso en la biblioteca":
+    "Vuelve a la biblioteca y confirma que el caso aparece guardado.",
 };
 
 function formatTime(milliseconds: number) {

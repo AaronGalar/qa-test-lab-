@@ -19,14 +19,14 @@
 
 ## El laboratorio
 
-QA Test Lab es una demo interactiva para recorrer tareas habituales de testing y enseñar cómo automatizarlas. La aplicación reúne un dashboard, una biblioteca de casos de prueba y un asistente conversacional simulado. Playwright graba recorridos reales en Chromium y Remotion los transforma en vídeos guiados.
+QA Test Lab es una demo interactiva para recorrer tareas habituales de testing y enseñar cómo automatizarlas. La aplicación reúne un dashboard, una biblioteca de casos de prueba y un generador guiado de escenarios QA, implementado con reglas deterministas en FastAPI y sin depender de servicios de IA. Playwright graba recorridos reales en Chromium y Remotion los transforma en vídeos guiados.
 
 | Área                | Qué puedes probar                                                                              |
 | ------------------- | ---------------------------------------------------------------------------------------------- |
 | **Casos de prueba** | Crear casos, asignar prioridad, buscar, filtrar, cambiar estados y revisar métricas.           |
 | **Tareas**          | Añadir tareas, marcarlas como completadas y eliminarlas.                                       |
 | **Preguntas frecuentes** | Consultar y guardar preguntas en el backend FastAPI y su base de datos SQLite.                |
-| **Asistente QA**         | Explorar una conversación de ejemplo sobre escenarios de prueba. Las respuestas son simuladas. |
+| **Generador de escenarios** | Crear sugerencias de pruebas para login, formularios y operaciones CRUD, revisar la vista previa y guardar solo las elegidas. |
 | **Vídeos QA**       | Grabar interacciones del navegador, medir pasos y renderizar tutoriales en MP4.                |
 
 <p align="center">
@@ -66,10 +66,10 @@ Abre [http://localhost:3000](http://localhost:3000). Para entrar en la demo:
 | `npx playwright test`     | Ejecuta la suite en Chromium, Firefox y WebKit.                          |
 | `npx playwright test --project=chromium` | Ejecuta la suite en Chromium y guarda los vídeos QA.          |
 | `npm run test:tareas`     | Prueba el flujo de añadir, completar y eliminar tareas en Chromium.      |
+| `npm run test:generator`  | Prueba la vista previa y el guardado selectivo del generador.            |
 | `npm run remotion`        | Abre Remotion Studio con las composiciones del proyecto.                 |
 | `npm run record:tutorial` | Graba el recorrido de primer uso con Playwright.                         |
 | `npm run render:tutorial` | Graba el recorrido y renderiza el tutorial completo.                     |
-| `npm run render:ai-demo`  | Renderiza la composición de demostración del asistente IA.               |
 | `npm run render:qa`       | Renderiza TC-004 usando la grabación y métricas disponibles.             |
 | `npm run render:tareas`   | Ejecuta el test de tareas y renderiza `output/Tareas.mp4` con Remotion.   |
 
@@ -90,6 +90,28 @@ Las preguntas, tareas y casos de prueba se guardan en FastAPI y SQLite:
 | `POST` | `/api/test-cases` | Recibe `title`, `description`, `priority` y `status`; el backend asigna el ID. |
 | `PATCH` | `/api/test-cases/{id}` | Actualiza el estado del caso. |
 | `DELETE` | `/api/test-cases/{id}` | Elimina el caso de prueba. |
+| `POST` | `/api/test-case-suggestions` | Recibe `category` (`login`, `form` o `crud`) y `feature_name`; devuelve escenarios por reglas, sin IA. |
+
+Ejemplo de petición al generador:
+
+```json
+{
+  "category": "login",
+  "feature_name": "Acceso de clientes"
+}
+```
+
+El generador no guarda las sugerencias automáticamente. Primero las devuelve
+para revisión; cada caso marcado se guarda después mediante `POST
+/api/test-cases` con estado `PENDING`. Las reglas se encuentran en
+`backend/scenarios.py`, separadas de las rutas HTTP para que puedan probarse sin
+arrancar el servidor. Para ejecutarlas:
+
+```powershell
+cd backend
+.\venv\Scripts\Activate.ps1
+python -m unittest test_scenarios
+```
 
 La primera vez que arranca el backend, añade los tres casos de demostración
 originales si la tabla está vacía. Los IDs nuevos se asignan consecutivamente
@@ -134,7 +156,7 @@ Para generar el tutorial de primer uso:
 npm run render:tutorial
 ```
 
-La grabación fuente queda en `public/recordings/tutorial-ia.webm` y el vídeo final en `output/Tutorial-primer-uso.mp4`. La demo del asistente se genera como `output/Demo-asistente-IA.mp4`. Los renders e imágenes de vista previa se guardan en `output/`; las grabaciones fuente y los datos de prueba, en `public/`.
+La grabación fuente queda en `public/recordings/tutorial-ia.webm` y el vídeo final en `output/Tutorial-primer-uso.mp4`. Si ya tienes una copia generada antes del generador de escenarios, vuelve a ejecutar el comando para actualizarla. Los renders e imágenes de vista previa se guardan en `output/`; las grabaciones fuente y los datos de prueba, en `public/`.
 
 El recorrido de tareas puede probarse y renderizarse con `npm run render:tareas`. Si el test de Chromium pasa, Remotion genera `output/Tareas.mp4`. Para ejecutar un escenario completo de extremo a extremo y producir su grabación QA, usa `npm run render:qa -- TC-004`.
 
@@ -158,7 +180,8 @@ docs/                 Guías de trabajo y creación de vídeos QA
 ## Documentación
 
 - `npm run test:tareas` prueba la creación, actualización y eliminación de tareas.
-- `npx playwright test --project=chromium tests/app-basics.spec.ts tests/ai-demo.spec.ts tests/login.spec.ts` valida los flujos básicos sin recorrer todos los navegadores.
+- `npm run test:generator` valida la generación, vista previa y guardado selectivo de escenarios.
+- `npx playwright test --project=chromium tests/app-basics.spec.ts tests/generator.spec.ts tests/login.spec.ts` valida flujos clave sin recorrer todos los navegadores.
 - [Guía práctica para crear vídeos QA](docs/GUIA-CREAR-VIDEOS-QA.md)
 - [Guía para modificar vídeos QA](docs/GUIA-TRABAJO-MODIFICAR-VIDEOS-QA.md)
 - [Playbook de IA para vídeos QA](docs/PLAYBOOK-IA-VIDEOS-QA.md)
@@ -167,5 +190,6 @@ docs/                 Guías de trabajo y creación de vídeos QA
 
 Las preguntas frecuentes y los casos de prueba se leen y guardan en el backend
 FastAPI y SQLite de `backend/`. Las tareas también se guardan en ese backend y
-persisten al recargar. El inicio de sesión y el asistente de IA son
-simulaciones; las credenciales de arriba son exclusivamente para esta demo.
+persisten al recargar. El inicio de sesión es una simulación; el generador de
+escenarios utiliza reglas locales del backend y no llama a ningún modelo de IA.
+Las credenciales de arriba son exclusivamente para esta demo.

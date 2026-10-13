@@ -8,10 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "remotion": "remotion studio remotion/index.ts",
-    "render:ai-demo": "node scripts/render-ai-demo.mjs",
     "record:tutorial": "playwright test tests/real-first-use-tour.spec.ts --project=chromium --workers=1 --reporter=line",
     "render:tutorial": "node scripts/render-real-tutorial.mjs",
     "render:qa": "node scripts/render-tc004.mjs",
+    "test:generator": "playwright test tests/generator.spec.ts tests/generator-navigation.spec.ts --project=chromium --workers=1 --reporter=line",
     "test:tareas": "playwright test tests/tareas.spec.ts --project=chromium --workers=1 --reporter=line",
     "render:tareas": "node scripts/render-tareas.mjs"
   },
