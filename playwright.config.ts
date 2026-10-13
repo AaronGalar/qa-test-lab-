@@ -3,17 +3,30 @@ import { defineConfig, devices } from "@playwright/test";
 const port = process.env.PORT ?? "3000";
 const baseURL = `http://localhost:${port}`;
 
-// Los vídeos de las pruebas se crean solo en Chromium para evitar duplicados.
 export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
+  
+  // En CI damos 2 reintentos por si un runner de GitHub va lento
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  
+  // En CI usamos 2 workers para no saturar la CPU con 1 solo ni sobrecargar el server
+  workers: process.env.CI ? 2 : undefined,
+  
+  // Aumentamos el timeout general por test en CI (45 segundos)
+  timeout: process.env.CI ? 45_000 : 30_000,
+  
   reporter: process.env.CI ? "line" : "html",
+  
   use: {
     baseURL,
     trace: "on-first-retry",
+    
+    // Timeouts defensivos para acciones y navegaciones
+    actionTimeout: 10_000,
+    navigationTimeout: 15_000,
+    
     viewport: { width: 1920, height: 1080 },
     deviceScaleFactor: 1,
   },
@@ -25,10 +38,8 @@ export default defineConfig({
         ...devices["Desktop Chrome"],
         viewport: { width: 1920, height: 1080 },
         deviceScaleFactor: 1,
-        video: {
-          mode: "on",
-          size: { width: 1920, height: 1080 },
-        },
+        // Solo graba vídeo si falla o se reintenta para no bloquear el sistema de archivos en CI
+        video: process.env.CI ? "retain-on-failure" : "on",
       },
     },
 
@@ -47,5 +58,6 @@ export default defineConfig({
     command: `npm run start -- --port ${port}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
+    timeout: 120_000, // Dar más tiempo a Next.js para arrancar en GitHub Actions
   },
 });
