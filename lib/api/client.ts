@@ -4,34 +4,26 @@ const API_BASE_URL = (
 ).replace(/\/+$/, "");
 
 export async function apiRequest<T>(
-  path: string,
-  init?: RequestInit,
+  endpoint: string,
+  options: RequestInit = {}
 ): Promise<T> {
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  const url = `${API_BASE_URL}${normalizedPath}`;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-  console.log("[API] URL:", url);
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...options.headers,
+  };
 
-  let response: Response;
-
-  try {
-    response = await fetch(url, init);
-  } catch (error) {
-    console.error("[API] No se pudo conectar con el backend:", error);
-    throw new Error(
-      `No se pudo conectar con la API en ${API_BASE_URL}. Comprueba que el backend esté activo y que la URL sea correcta.`,
-    );
-  }
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers,
+  });
 
   if (!response.ok) {
-    const statusText = response.statusText
-      ? ` ${response.statusText}`
-      : "";
-
-    throw new Error(
-      `El backend respondió con HTTP ${response.status}${statusText}.`,
-    );
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Error al comunicarse con el servidor.");
   }
 
-  return (await response.json()) as T;
+  return response.json();
 }

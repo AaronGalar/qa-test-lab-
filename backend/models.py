@@ -2,6 +2,15 @@ from sqlalchemy import Column, Integer, String, Boolean ,Date, Text
 from database import Base
 from datetime import date
 
+class UsuarioModel (Base):
+  __tablename__ = "usuarios"
+
+  id = Column(Integer, primary_key=True, index=True) 
+    
+  email = Column(String, unique=True, index=True, nullable=False)
+  hashed_password = Column(String, nullable=False)
+  es_admin = Column(Boolean, default=False)
+
 class PreguntaModel(Base):
     __tablename__ = "preguntas"
 

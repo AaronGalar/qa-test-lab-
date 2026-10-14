@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type FormEvent,
-} from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import AppNavigation from "../components/AppNavigation";
 import {
   actualizarEstadoTestCase,
@@ -201,7 +195,9 @@ export default function TestCasesPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="hidden text-sm text-slate-300 sm:block">Tester</span>
+            <span className="hidden text-sm text-slate-300 sm:block">
+              Tester
+            </span>
             <div className="flex h-9 w-9 items-center justify-center rounded-full border border-sky-300/20 bg-sky-400/15 text-sm font-semibold text-sky-200">
               A
             </div>
@@ -447,9 +443,7 @@ export default function TestCasesPage() {
                             role="option"
                             aria-selected={priority === option.value}
                             onClick={() => {
-                              setPriority(
-                                option.value as TestCase["priority"],
-                              );
+                              setPriority(option.value as TestCase["priority"]);
                               setShowPriorityOptions(false);
                             }}
                             className="flex w-full items-start gap-3 rounded-lg px-3 py-3 text-left transition-colors hover:bg-white/[0.06] focus:bg-white/[0.06] focus:outline-none"
@@ -495,7 +489,10 @@ export default function TestCasesPage() {
                 </div>
 
                 {formError && (
-                  <p className="text-sm font-medium text-amber-300" role="alert">
+                  <p
+                    className="text-sm font-medium text-amber-300"
+                    role="alert"
+                  >
                     {formError}
                   </p>
                 )}
@@ -571,7 +568,10 @@ export default function TestCasesPage() {
             </div>
 
             {isLoading ? (
-              <p role="status" className="p-10 text-center text-sm text-slate-400">
+              <p
+                role="status"
+                className="p-10 text-center text-sm text-slate-400"
+              >
                 Cargando casos desde el backend...
               </p>
             ) : filteredTests.length === 0 ? (

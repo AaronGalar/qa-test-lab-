@@ -1,7 +1,59 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import AppNavigation from "./components/AppNavigation";
 
+interface TestCase {
+  id: string;
+  title: string;
+  status: "PASS" | "FAIL";
+}
+
+interface DashboardData {
+  total: number;
+  superados: number;
+  atencion: number;
+  actividad: TestCase[];
+}
+
 export default function Home() {
+  const [data, setData] = useState<DashboardData>({
+    total: 0,
+    superados: 0,
+    atencion: 0,
+    actividad: [],
+  });
+  const [loading, setLoading] = useState(true);
+
+  const cargarResumen = () => {
+    fetch("http://localhost:8000/api/dashboard/resumen", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Error al cargar datos");
+        return res.json();
+      })
+      .then((result) => {
+        setData(result);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error al actualizar resumen:", err);
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    cargarResumen();
+    window.addEventListener("focus", cargarResumen);
+    return () => {
+      window.removeEventListener("focus", cargarResumen);
+    };
+  }, []);
+
   return (
     <main className="min-h-screen bg-[#07111f] text-white antialiased">
       <header className="border-b border-white/[0.08] bg-[#0b192b]/90 backdrop-blur-xl">
@@ -10,7 +62,6 @@ export default function Home() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-400 text-lg shadow-[0_8px_24px_rgba(56,189,248,0.25)]">
               <span aria-hidden="true">✦</span>
             </div>
-
             <div>
               <h1 className="font-semibold tracking-tight">QA Test Lab</h1>
               <p className="text-xs text-slate-400">Tu espacio de pruebas</p>
@@ -18,10 +69,7 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="hidden text-sm text-slate-300 sm:block">
-              Aarón
-            </span>
-
+            <span className="hidden text-sm text-slate-300 sm:block">Aarón</span>
             <div className="flex h-9 w-9 items-center justify-center rounded-full border border-sky-300/20 bg-sky-400/15 text-sm font-semibold text-sky-200">
               A
             </div>
@@ -41,7 +89,6 @@ export default function Home() {
               <h2 className="text-3xl font-bold tracking-tight">
                 Resumen de calidad
               </h2>
-
               <p className="mt-2 max-w-xl text-sm text-slate-400">
                 Una lectura rápida del estado de tu suite y de las últimas
                 pruebas ejecutadas.
@@ -57,25 +104,16 @@ export default function Home() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            <StatCard title="Casos totales" value="24" icon="01" tone="sky" />
-
-            <StatCard title="Superados" value="18" icon="02" tone="green" />
-
-            <StatCard
-              title="Necesitan atención"
-              value="6"
-              icon="03"
-              tone="amber"
-            />
+            <StatCard title="Casos totales" value={loading ? "..." : String(data.total)} icon="01" tone="sky" />
+            <StatCard title="Superados" value={loading ? "..." : String(data.superados)} icon="02" tone="green" />
+            <StatCard title="Necesitan atención" value={loading ? "..." : String(data.atencion)} icon="03" tone="amber" />
           </div>
 
           <div className="mt-8 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0b192b]/80 shadow-2xl shadow-black/10">
             <div className="flex items-center justify-between border-b border-white/[0.07] px-6 py-5">
               <div>
                 <h3 className="font-semibold">Actividad reciente</h3>
-                <p className="mt-1 text-xs text-slate-500">
-                  Últimos casos ejecutados
-                </p>
+                <p className="mt-1 text-xs text-slate-500">Últimos casos ejecutados</p>
               </div>
               <span className="rounded-full border border-green-400/20 bg-green-400/10 px-3 py-1 text-xs font-semibold text-green-300">
                 Suite estable
@@ -83,13 +121,15 @@ export default function Home() {
             </div>
 
             <div>
-              <TestRow id="TC-001" title="Login correcto" status="PASS" />
-
-              <TestRow id="TC-002" title="Crear proyecto" status="PASS" />
-
-              <TestRow id="TC-003" title="Editar proyecto" status="PASS" />
-
-              <TestRow id="TC-004" title="Eliminar proyecto" status="FAIL" />
+              {loading ? (
+                <p className="p-6 text-sm text-slate-400">Cargando actividad...</p>
+              ) : data.actividad.length === 0 ? (
+                <p className="p-6 text-sm text-slate-400">No hay casos de prueba registrados aún.</p>
+              ) : (
+                data.actividad.map((test) => (
+                  <TestRow key={test.id} id={test.id} title={test.title} status={test.status} />
+                ))
+              )}
             </div>
           </div>
         </section>
@@ -109,7 +149,6 @@ function StatCard({
   icon: string;
   tone: "sky" | "green" | "amber";
 }) {
-  // El tipo literal de "tone" limita el estilo a las tres variantes definidas.
   const tones = {
     sky: "border-sky-300/15 bg-sky-300/[0.07] text-sky-300",
     green: "border-green-300/15 bg-green-300/[0.07] text-green-300",
@@ -120,15 +159,9 @@ function StatCard({
     <div className={`rounded-2xl border p-6 ${tones[tone]}`}>
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-300">{title}</p>
-
-        <span className="text-xs font-bold tracking-widest opacity-70">
-          {icon}
-        </span>
+        <span className="text-xs font-bold tracking-widest opacity-70">{icon}</span>
       </div>
-
-      <p className="mt-5 text-4xl font-bold tracking-tight text-white">
-        {value}
-      </p>
+      <p className="mt-5 text-4xl font-bold tracking-tight text-white">{value}</p>
     </div>
   );
 }
@@ -142,7 +175,6 @@ function TestRow({
   title: string;
   status: "PASS" | "FAIL";
 }) {
-  // El estado determina tanto el texto como el color que ve la persona usuaria.
   const passed = status === "PASS";
 
   return (
@@ -151,10 +183,8 @@ function TestRow({
         <span className="rounded-md bg-white/[0.05] px-2 py-1 font-mono text-[11px] text-slate-500">
           {id}
         </span>
-
         <span className="text-sm">{title}</span>
       </div>
-
       <span
         className={
           passed
