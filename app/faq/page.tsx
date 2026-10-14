@@ -46,7 +46,7 @@ export default function FaqPage() {
 
     try {
       const preguntaCreada = await crearPregunta(texto);
-      setPreguntas((actuales) => [...actuales, preguntaCreada]);
+
       setPregunta("");
       setMensaje("Pregunta guardada en el backend.");
     } catch (reason) {

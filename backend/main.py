@@ -290,17 +290,21 @@ class PreguntaSchema(BaseModel):
 
 @app.get("/api/preguntas")
 def obtener_preguntas(db: Session = Depends(get_db)):
-    preguntas = db.query(models.PreguntaModel).order_by(models.PreguntaModel.id).all()
+    preguntas = db.query(models.PreguntaModel).filter(models.PreguntaModel.publicada == True).order_by(models.PreguntaModel.id).all()
     return preguntas
 
+@app.get("/api/admin/preguntas-pendientes")
+def obtener_preguntas_pendientes(db: Session = Depends(get_db)):
+    # Devuelve solo las preguntas pendientes de revisión
+    return db.query(models.PreguntaModel).filter(models.PreguntaModel.publicada == False).order_by(models.PreguntaModel.id.desc()).all()
 
 @app.post("/api/preguntas")
 def crear_pregunta(pregunta: PreguntaSchema, db: Session = Depends(get_db)):
-    nueva_pregunta = models.PreguntaModel(texto=pregunta.texto)
+    nueva_pregunta = models.PreguntaModel(texto=pregunta.texto,publicada = False)
     db.add(nueva_pregunta)
     db.commit()
     db.refresh(nueva_pregunta)
-    return {"MENSAJE": "Pregunta creada exitosamente", "pregunta": nueva_pregunta}
+    return {"MENSAJE": "Pregunta enviada el backend", "pregunta": nueva_pregunta}
 
 class IncidenciaCreate(BaseModel):
     title: str

@@ -13,6 +13,9 @@ type CrearPreguntaResponse = {
 export function obtenerPreguntas(): Promise<Pregunta[]> {
   return apiRequest<Pregunta[]>("/api/preguntas");
 }
+export function obtenerPreguntasPendientes(): Promise<Pregunta[]> {
+  return apiRequest<Pregunta[]>("/api/admin/preguntas-pendientes");
+}
 
 export async function crearPregunta(texto: string): Promise<Pregunta> {
   const response = await apiRequest<CrearPreguntaResponse>("/api/preguntas", {

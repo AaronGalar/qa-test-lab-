@@ -1,23 +1,46 @@
+
 import { defineConfig, devices } from "@playwright/test";
 
 const port = process.env.PORT ?? "3000";
-const baseURL = `http://localhost:${port}`;
+const baseURL = `http://127.0.0.1:${port}`;
+const isCI = Boolean(process.env.CI);
 
 export default defineConfig({
   testDir: "./tests",
-  fullyParallel: false, // Desactivar paralelismo extremo en CI para evitar bloqueos
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0, // 2 reintentos automáticos en CI si algo falla por red
-  workers: process.env.CI ? 1 : undefined, // 1 solo worker en CI para máxima estabilidad
-  timeout: 45_000, // Timeout generoso por test
-  reporter: process.env.CI ? "html" : "html",
+
+  fullyParallel: false,
+  forbidOnly: isCI,
+
+  retries: isCI ? 2 : 0,
+  workers: isCI ? 1 : undefined,
+
+  timeout: 45_000,
+  expect: {
+    timeout: 10_000,
+  },
+
+  reporter: [
+    ["list"],
+    ["html", { outputFolder: "playwright-report", open: "never" }],
+  ],
+
+  outputDir: "test-results",
 
   use: {
     baseURL,
-    trace: "on-first-retry",
+
     actionTimeout: 15_000,
     navigationTimeout: 20_000,
-    viewport: { width: 1920, height: 1080 },
+
+    trace: "on-first-retry",
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
+
+    viewport: {
+      width: 1920,
+      height: 1080,
+    },
+
     deviceScaleFactor: 1,
   },
 
@@ -26,23 +49,28 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        video: process.env.CI ? "retain-on-failure" : "on",
       },
     },
     {
       name: "firefox",
-      use: { ...devices["Desktop Firefox"], video: "off" },
+      use: {
+        ...devices["Desktop Firefox"],
+      },
     },
     {
       name: "webkit",
-      use: { ...devices["Desktop Safari"], video: "off" },
+      use: {
+        ...devices["Desktop Safari"],
+      },
     },
   ],
 
   webServer: {
-    command: `npm run start -- --port ${port}`,
+    command: `npm run start -- --hostname 127.0.0.1 --port ${port}`,
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000, // Darle hasta 2 minutos a Next.js para arrancar holgadamente en el runner
+    reuseExistingServer: !isCI,
+    timeout: 120_000,
+    stdout: "pipe",
+    stderr: "pipe",
   },
 });

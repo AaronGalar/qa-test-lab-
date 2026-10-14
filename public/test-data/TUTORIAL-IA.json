@@ -1,69 +1,51 @@
 {
   "id": "TUTORIAL-IA",
   "title": "Primer uso de QA Test Lab y el generador de escenarios",
-  "status": "PASSED",
-  "startedAt": 1791898221835,
-  "durationMs": 39372,
+  "status": "FAILED",
+  "startedAt": 1791901311295,
+  "durationMs": 27614,
   "steps": [
     {
       "name": "Abrir la pantalla de inicio de sesión",
       "status": "PASSED",
-      "startMs": 9,
-      "endMs": 2248
+      "startMs": 6,
+      "endMs": 1246
     },
     {
       "name": "Introducir las credenciales de demostración",
       "status": "PASSED",
-      "startMs": 2248,
-      "endMs": 8094
+      "startMs": 1246,
+      "endMs": 5530
     },
     {
       "name": "Iniciar sesión",
       "status": "PASSED",
-      "startMs": 8094,
-      "endMs": 13164
+      "startMs": 5530,
+      "endMs": 7847
     },
     {
       "name": "Abrir Casos de prueba",
       "status": "PASSED",
-      "startMs": 13164,
-      "endMs": 17105
+      "startMs": 7847,
+      "endMs": 10683
     },
     {
       "name": "Abrir el generador de escenarios",
       "status": "PASSED",
-      "startMs": 17105,
-      "endMs": 20850
+      "startMs": 10683,
+      "endMs": 13051
     },
     {
       "name": "Elegir tipo y nombre de funcionalidad",
       "status": "PASSED",
-      "startMs": 20850,
-      "endMs": 25481
+      "startMs": 13051,
+      "endMs": 16541
     },
     {
       "name": "Generar y revisar los escenarios",
-      "status": "PASSED",
-      "startMs": 25481,
-      "endMs": 28935
-    },
-    {
-      "name": "Seleccionar el escenario que se guardará",
-      "status": "PASSED",
-      "startMs": 28935,
-      "endMs": 29927
-    },
-    {
-      "name": "Guardar el escenario elegido",
-      "status": "PASSED",
-      "startMs": 29927,
-      "endMs": 33438
-    },
-    {
-      "name": "Comprobar el caso en la biblioteca",
-      "status": "PASSED",
-      "startMs": 33438,
-      "endMs": 37565
+      "status": "FAILED",
+      "startMs": 16541,
+      "endMs": 27614
     }
   ]
 }

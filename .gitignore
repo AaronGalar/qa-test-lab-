@@ -56,3 +56,11 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 /public/recordings/page@*.webm
+
+# Entorno virtual y caché de Python
+backend/venv/
+backend/__pycache__/
+
+# Base de datos SQLite
+backend/*.db
+backend/preguntas.db

@@ -20,9 +20,9 @@ export default function Respuestas({ preguntas }: RespuestasProps) {
           key={pregunta.id}
           className="rounded border border-white/10 bg-[#0b192b] p-3 text-left"
         >
-          ❓ {pregunta.texto}
+           {pregunta.texto}
         </li>
-      ))}
+      ))} 
     </ul>
   );
 }

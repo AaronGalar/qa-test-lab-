@@ -7,6 +7,7 @@ class PreguntaModel(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     texto = Column(String, index=True)
+    publicada = Column (Boolean, default = False)
 
 class TestCaseModel(Base):
     __tablename__ = "qa_test_cases"
