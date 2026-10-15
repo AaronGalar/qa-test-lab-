@@ -12,7 +12,8 @@ from auth import (
     obtener_password_hash,
     verificar_password,
     crear_access_token,
-    requiere_admin
+    requiere_admin,
+    obtener_usuario_actual
 )
 
 app = FastAPI()
@@ -73,6 +74,25 @@ try:
     migrate_incidencias_schema()
 except Exception:
     pass
+def migrate_preguntas_schema():
+    if not inspect(engine).has_table("preguntas"):
+        return
+    columns = {
+        column["name"] for column in inspect(engine).get_columns("preguntas")
+    }
+    with engine.begin() as connection:
+        if "creado_por" not in columns:
+            connection.execute(
+                text(
+                    "ALTER TABLE preguntas "
+                    "ADD COLUMN creado_por VARCHAR DEFAULT 'pupilo@test.com'"
+                )
+            )
+
+try:
+    migrate_preguntas_schema()
+except Exception:
+    pass
 
 # 2. Endpoint de Registro
 @app.post("/api/auth/registro")
@@ -114,6 +134,78 @@ def obtener_preguntas_pendientes(
     admin: models.UsuarioModel = Depends(requiere_admin)
 ):
     return db.query(models.PreguntaModel).filter(models.PreguntaModel.publicada == False).order_by(models.PreguntaModel.id.desc()).all()
+
+# Ruta para el panel de supervisión del QA Senior
+@app.get("/api/admin/dashboard-senior")
+def obtener_dashboard_senior(
+    db: Session = Depends(get_db),
+    admin: models.UsuarioModel = Depends(requiere_admin)
+):
+    total_casos = db.query(models.TestCaseModel).count()
+    total_incidencias = db.query(models.IncidenciaModel).count()
+    
+    preguntas_pendientes = (
+        db.query(models.PreguntaModel)
+        .filter(models.PreguntaModel.publicada == False)
+        .all()
+    )
+    
+    incidencias_criticas = (
+        db.query(models.IncidenciaModel)
+        .filter(models.IncidenciaModel.severity == "High", models.IncidenciaModel.status != "RESOLVED")
+        .all()
+    )
+
+    todos_los_casos = db.query(models.TestCaseModel).all()
+    
+    # Agrupación para las estadísticas
+    actividad_por_pupilo = {}
+    # Lista detallada para que el admin vea cada caso con su autor
+    lista_detallada_casos = []
+
+    for caso in todos_los_casos:
+        autor = caso.creado_por or "Sistema / Semilla"
+        
+        # Guardamos el detalle individual
+        lista_detallada_casos.append({
+            "id": caso.id,
+            "title": caso.title,
+            "status": caso.status,
+            "creado_por": autor
+        })
+
+        if autor not in actividad_por_pupilo:
+            actividad_por_pupilo[autor] = {"total_casos": 0, "pass": 0, "fail": 0, "pending": 0}
+        
+        actividad_por_pupilo[autor]["total_casos"] += 1
+        estado = (caso.status or "PENDING").lower()
+        if estado == "pass":
+            actividad_por_pupilo[autor]["pass"] += 1
+        elif estado == "fail":
+            actividad_por_pupilo[autor]["fail"] += 1
+        else:
+            actividad_por_pupilo[autor]["pending"] += 1
+
+    desglose_pupilos = [
+        {"email": email, **stats} for email, stats in actividad_por_pupilo.items()
+    ]
+
+    return {
+        "resumen_equipo": {
+            "total_casos": total_casos,
+            "total_incidencias": total_incidencias,
+            "pendientes_revision": len(preguntas_pendientes),
+            "criticas_abiertas": len(incidencias_criticas)
+        },
+        "desglose_pupilos": desglose_pupilos,
+        "casos_detallados": lista_detallada_casos, # <--- Enviamos la lista completa con el autor de cada uno
+        "preguntas_pendientes": [
+            {"id": p.id, "texto": p.texto} for p in preguntas_pendientes
+        ],
+        "incidencias_criticas": [
+            {"id": i.id, "title": i.title, "severity": i.severity, "status": i.status} for i in incidencias_criticas
+        ]
+    }
 
 class TestCaseSchema(BaseModel):
     id: Optional[str] = None
@@ -212,6 +304,7 @@ def obtener_sugerencias_test_cases(solicitud: TestCaseSuggestionRequest):
         return generar_escenarios(solicitud.category, solicitud.feature_name)
     except ValueError as reason:
         raise HTTPException(status_code=422, detail=str(reason)) from reason
+  
 
 @app.get("/api/test-cases")
 def obtener_test_cases(db: Session = Depends(get_db)):
@@ -243,13 +336,18 @@ def obtener_resumen_dashboard(db: Session = Depends(get_db)):
     }
 
 @app.post("/api/test-cases", response_model=TestCaseSchema)
-def crear_test_case(test_case: TestCaseSchema, db: Session = Depends(get_db)):
+def crear_test_case(
+    test_case: TestCaseSchema, 
+    db: Session = Depends(get_db),
+    usuario_actual: models.UsuarioModel = Depends(obtener_usuario_actual) # <--- Añadimos esto para capturar al usuario logueado
+):
     nuevo_test_case = models.TestCaseModel(
         id=test_case.id or next_test_case_id(db),
         title=test_case.title,
         description=test_case.description,
         priority=test_case.priority,
         status=test_case.status,
+        creado_por=usuario_actual.email # <--- Guardamos su email automáticamente aquí
     )
     db.add(nuevo_test_case)
     db.commit()
@@ -328,15 +426,21 @@ class PreguntaSchema(BaseModel):
 @app.get("/api/preguntas")
 def obtener_preguntas(db: Session = Depends(get_db)):
     return db.query(models.PreguntaModel).filter(models.PreguntaModel.publicada == True).order_by(models.PreguntaModel.id).all()
-
 @app.post("/api/preguntas")
-def crear_pregunta(pregunta: PreguntaSchema, db: Session = Depends(get_db)):
-    nueva_pregunta = models.PreguntaModel(texto=pregunta.texto, publicada=False)
+def crear_pregunta(
+    pregunta: PreguntaSchema, 
+    db: Session = Depends(get_db),
+    usuario_actual: models.UsuarioModel = Depends(obtener_usuario_actual) # <--- Añadido
+):
+    nueva_pregunta = models.PreguntaModel(
+        texto=pregunta.texto, 
+        publicada=False,
+        creado_por=usuario_actual.email # <--- Guardamos quién hizo la pregunta
+    )
     db.add(nueva_pregunta)
     db.commit()
     db.refresh(nueva_pregunta)
     return {"MENSAJE": "Pregunta enviada al backend", "pregunta": nueva_pregunta}
-
 # Incidencias
 class IncidenciaCreate(BaseModel):
     title: str
@@ -357,13 +461,17 @@ class IncidenciaResponse(BaseModel):
 @app.get("/api/incidencias", response_model=list[IncidenciaResponse])
 def obtener_incidencias(db: Session = Depends(get_db)):
     return db.query(models.IncidenciaModel).order_by(models.IncidenciaModel.id).all()
-
 @app.post("/api/incidencias", response_model=IncidenciaResponse)
-def crear_incidencia(incidencia: IncidenciaCreate, db: Session = Depends(get_db)):
+def crear_incidencia(
+    incidencia: IncidenciaCreate, 
+    db: Session = Depends(get_db),
+    usuario_actual: models.UsuarioModel = Depends(obtener_usuario_actual) # <--- Añadido
+):
     nueva_incidencia = models.IncidenciaModel(
         title=incidencia.title,
         description=incidencia.description,
-        severity=incidencia.severity
+        severity=incidencia.severity,
+        creado_por=usuario_actual.email # <--- Guardamos quién reportó el bug
     )
     db.add(nueva_incidencia)
     db.commit()

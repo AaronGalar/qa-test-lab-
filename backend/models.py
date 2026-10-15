@@ -17,6 +17,7 @@ class PreguntaModel(Base):
     id = Column(Integer, primary_key=True, index=True)
     texto = Column(String, index=True)
     publicada = Column (Boolean, default = False)
+    creado_por = Column(String, default="pupilo@test.com")
 
 class TestCaseModel(Base):
     __tablename__ = "qa_test_cases"
@@ -26,6 +27,7 @@ class TestCaseModel(Base):
     description = Column(String)
     priority = Column(String)
     status = Column(String)
+    creado_por = Column(String, default="pupilo@test.com")
 
 
 class TestCaseSequenceModel(Base):
@@ -51,6 +53,7 @@ class IncidenciaModel(Base):
     description = Column(String, nullable=False)
     status = Column(String, default="OPEN", nullable=False)
     severity = Column(String, nullable=False)
+    creado_por = Column(String, default="pupilo@test.com")
 
 
 
