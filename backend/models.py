@@ -61,7 +61,7 @@ class ProyectoModel(Base):
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
 
-    # ⚠️ ASEGÚRATE DE QUE ESTOS TRES CAMPOS ESTÉN AQUÍ:
+    # 
     fecha_inicio = Column(Date, nullable=True)
     ultimo_testing = Column(Date, nullable=True)
     detalles_testing = Column(Text, nullable=True)
