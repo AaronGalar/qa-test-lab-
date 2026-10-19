@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import AppNavigation from "../components/AppNavigation";
+
 
 interface DashboardSenior {
   resumen_equipo: {
@@ -113,7 +113,7 @@ export default function AdminDashboard() {
       </header>
 
       <div className="mx-auto flex max-w-[1600px]">
-        <AppNavigation activeHref="/admin" />
+        
 
         <section className="min-w-0 flex-1 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.10),transparent_34%)] p-6 lg:p-10">
           <div className="mb-8">

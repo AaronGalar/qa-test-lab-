@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation"; // 👈 Hook para obtener la ruta actual
 import { useEffect, useState } from "react";
 
 const navigationItems = [
@@ -15,14 +16,11 @@ const navigationItems = [
   { href: "/tareas", number: "04", label: "Lista de tareas", icon: "📋" },
   { href: "/faq", number: "05", label: "Preguntas frecuentes", icon: "💬" },
   { href: "/proyectos", number: "06", label: "Proyectos", icon: "📁" },
-  { href: "/fuentes", number: "07", label: "Fuentes y Tutoriales", icon: "📚" }
+  { href: "/fuentes", number: "07", label: "Fuentes y Tutoriales", icon: "📚" },
 ] as const;
 
-type AppNavigationProps = {
-  activeHref: (typeof navigationItems)[number]["href"] | "/admin";
-};
-
-export default function AppNavigation({ activeHref }: AppNavigationProps) {
+export default function AppNavigation() {
+  const pathname = usePathname(); // 👈 Detecta la URL activa dinámicamente
   const [isClient, setIsClient] = useState(false);
   const [esAdmin, setEsAdmin] = useState(false);
 
@@ -34,7 +32,7 @@ export default function AppNavigation({ activeHref }: AppNavigationProps) {
     }
   }, []);
 
-  const isAdminActive = activeHref === "/admin";
+  const isAdminActive = pathname === "/admin";
 
   return (
     <aside className="sticky top-0 flex h-screen w-72 shrink-0 flex-col border-r border-white/[0.08] bg-[#07111f]/95 p-5 backdrop-blur-xl">
@@ -45,7 +43,8 @@ export default function AppNavigation({ activeHref }: AppNavigationProps) {
 
         <nav aria-label="Navegación principal" className="space-y-2">
           {navigationItems.map((item) => {
-            const isActive = item.href === activeHref;
+            // Comprueba si la ruta actual coincide exactamente con el enlace
+            const isActive = pathname === item.href;
 
             return (
               <Link

@@ -124,20 +124,7 @@ export default function TestCaseGeneratorPage() {
 
   return (
     <main className="min-h-screen bg-[#07111f] text-white antialiased">
-      <header className="border-b border-white/[0.08] bg-[#0b192b]/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-4 lg:px-10">
-          <div>
-            <h1 className="font-semibold tracking-tight">QA Test Lab</h1>
-            <p className="text-xs text-slate-400">Tu espacio de pruebas</p>
-          </div>
-          <Link
-            href="/test-cases"
-            className="text-sm text-slate-400 transition-colors hover:text-white"
-          >
-            Volver a casos
-          </Link>
-        </div>
-      </header>
+    
 
       <div className="mx-auto flex max-w-[1600px]">
       
@@ -146,6 +133,12 @@ export default function TestCaseGeneratorPage() {
           <div className="mx-auto max-w-4xl">
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-sky-300/80">
               Herramienta guiada
+              <Link 
+    href="/" 
+    className="shrink-0 text-sm font-medium text-slate-400 hover:text-sky-400 transition-colors flex items-center gap-1.5"
+  >
+    ← Volver al inicio
+  </Link>
             </p>
             <h2 className="text-3xl font-bold tracking-tight">
               Generador de escenarios QA

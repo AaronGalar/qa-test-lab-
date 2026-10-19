@@ -183,27 +183,7 @@ export default function TestCasesPage() {
 
   return (
     <main className="min-h-screen bg-[#07111f] text-white antialiased">
-      <header className="sticky top-0 z-40 border-b border-white/[0.08] bg-[#0b192b]/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-4 lg:px-10">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-400 text-lg text-sky-950 shadow-[0_8px_24px_rgba(56,189,248,0.25)]">
-              <span aria-hidden="true">✦</span>
-            </div>
-            <div>
-              <h1 className="font-semibold tracking-tight">QA Test Lab</h1>
-              <p className="text-xs text-slate-400">Tu espacio de pruebas</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="hidden text-sm text-slate-300 sm:block">
-              Tester
-            </span>
-            <div className="flex h-9 w-9 items-center justify-center rounded-full border border-sky-300/20 bg-sky-400/15 text-sm font-semibold text-sky-200">
-              A
-            </div>
-          </div>
-        </div>
-      </header>
+      
 
       <div className="mx-auto flex max-w-[1600px]">
        

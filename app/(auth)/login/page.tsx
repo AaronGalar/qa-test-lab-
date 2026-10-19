@@ -21,9 +21,15 @@ export default function LoginPage() {
     try {
       const data = await loginUsuario(email, password);
       
-      // Redirigir según el rol del usuario
+      // 1. Guardar los datos esenciales en localStorage para que la app los reconozca
+      localStorage.setItem("es_admin", data.es_admin ? "true" : "false");
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+      
+      // 2. Redirigir correctamente según el rol
       if (data.es_admin) {
-        router.push("/");
+        router.push("/admin"); // O al panel de administración que corresponda
       } else {
         router.push("/");
       }
@@ -85,16 +91,13 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-slate-400"
-        >  <p className="mt-4 text-center text-sm text-gray-400">
+        <div className="mt-6 text-center text-sm text-gray-400">
           ¿No estás registrad@?{" "}
           <Link href="/registro" className="text-blue-400 hover:underline">
-            Registrate aqui 
+            Registrate aqui
           </Link>
-        </p>
         </div>
       </div>
-      
     </main>
   );
 }
