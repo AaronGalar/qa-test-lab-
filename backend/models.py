@@ -1,23 +1,28 @@
-from sqlalchemy import Column, Integer, String, Boolean ,Date, Text
+from sqlalchemy import Column, Integer, String, Boolean, Date, Text, DateTime
 from database import Base
 from datetime import date
 
-class UsuarioModel (Base):
-  __tablename__ = "usuarios"
+class UsuarioModel(Base):
+    __tablename__ = "usuarios"
 
-  id = Column(Integer, primary_key=True, index=True) 
-    
-  email = Column(String, unique=True, index=True, nullable=False)
-  hashed_password = Column(String, nullable=False)
-  es_admin = Column(Boolean, default=False)
+    id = Column(Integer, primary_key=True, index=True) 
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    es_admin = Column(Boolean, default=False)
 
 class PreguntaModel(Base):
     __tablename__ = "preguntas"
 
     id = Column(Integer, primary_key=True, index=True)
     texto = Column(String, index=True)
-    publicada = Column (Boolean, default = False)
+    publicada = Column(Boolean, default=False)
     creado_por = Column(String, default="pupilo@test.com")
+    
+    # ✅ Ahora sí están dentro de la clase correctamente indentadas
+    respuesta = Column(Text, nullable=True)
+    respondido_por = Column(String, nullable=True)
+    fecha_respuesta = Column(DateTime, nullable=True)
+    estado = Column(String, default="Pendiente")
 
 class TestCaseModel(Base):
     __tablename__ = "qa_test_cases"
@@ -29,14 +34,11 @@ class TestCaseModel(Base):
     status = Column(String)
     creado_por = Column(String, default="pupilo@test.com")
 
-
 class TestCaseSequenceModel(Base):
     __tablename__ = "test_case_sequences"
 
     name = Column(String, primary_key=True)
     value = Column(Integer, nullable=False)
-
-   # False para False, True para True
 
 class TareaModel(Base):
     __tablename__ = "tareas"
@@ -55,16 +57,12 @@ class IncidenciaModel(Base):
     severity = Column(String, nullable=False)
     creado_por = Column(String, default="pupilo@test.com")
 
-
-
 class ProyectoModel(Base):
     __tablename__ = "proyectos"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
-
-    # 
     fecha_inicio = Column(Date, nullable=True)
     ultimo_testing = Column(Date, nullable=True)
     detalles_testing = Column(Text, nullable=True)

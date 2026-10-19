@@ -32,6 +32,10 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // 1. Estado para guardar el borrador de respuesta por cada ID de pregunta
+  const [respuestasTexto, setRespuestasTexto] = useState<{ [key: number]: string }>({});
+  const [enviandoId, setEnviandoId] = useState<number | null>(null);
+
   const cargarDatosAdmin = () => {
     fetch("http://localhost:8000/api/admin/dashboard-senior", {
       headers: {
@@ -52,6 +56,36 @@ export default function AdminDashboard() {
         setError(err.message);
         setLoading(false);
       });
+  };
+
+  // 2. Función para responder a una pregunta y actualizar el estado
+  const enviarRespuesta = async (preguntaId: number) => {
+    const texto = respuestasTexto[preguntaId];
+    if (!texto || !texto.trim()) return;
+
+    setEnviandoId(preguntaId);
+    try {
+      const res = await fetch(`http://localhost:8000/api/admin/preguntas/${preguntaId}/responder`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+        },
+        body: JSON.stringify({ respuesta: texto }),
+      });
+
+      if (res.ok) {
+        // Limpiamos el texto de la respuesta y recargamos los datos del dashboard
+        setRespuestasTexto((prev) => ({ ...prev, [preguntaId]: "" }));
+        cargarDatosAdmin();
+      } else {
+        alert("Error al enviar la respuesta.");
+      }
+    } catch (e) {
+      alert("Hubo un fallo de conexión al responder la pregunta.");
+    } finally {
+      setEnviandoId(null);
+    }
   };
 
   useEffect(() => {
@@ -120,7 +154,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Nueva Tabla: Actividad agrupada por Pupilo */}
+              {/* Actividad por Pupilo */}
               <div className="mt-8 rounded-2xl border border-white/[0.08] bg-[#0b192b]/80 p-6 shadow-xl">
                 <h3 className="font-semibold text-purple-300">Actividad del equipo por Pupilo</h3>
                 <p className="mt-1 text-xs text-slate-500">Resumen de casos creados y estados por cada alumno</p>
@@ -159,7 +193,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               
-              {/* Nueva Tabla: Casos detallados con su autor */}
+              {/* Casos detallados */}
               <div className="mt-8 rounded-2xl border border-white/[0.08] bg-[#0b192b]/80 p-6 shadow-xl">
                 <h3 className="font-semibold text-purple-300">Casos de prueba detallados</h3>
                 <p className="mt-1 text-xs text-slate-500">Listado de casos con indicación del pupilo que los creó</p>
@@ -205,19 +239,46 @@ export default function AdminDashboard() {
 
               {/* Secciones de Alertas / Tareas del Senior */}
               <div className="mt-8 grid gap-8 lg:grid-cols-2">
-                {/* Preguntas pendientes */}
+                
+                {/* 3. Preguntas de pupilos por revisar (AHORA CON ÁREA DE RESPUESTA) */}
                 <div className="rounded-2xl border border-white/[0.08] bg-[#0b192b]/80 p-6 shadow-xl">
                   <h3 className="font-semibold text-purple-300">Preguntas de pupilos por revisar</h3>
-                  <p className="mt-1 text-xs text-slate-500">Dudas enviadas que esperan validación</p>
+                  <p className="mt-1 text-xs text-slate-500">Dudas enviadas que esperan respuesta del Senior</p>
                   
-                  <div className="mt-4 space-y-3">
+                  <div className="mt-4 space-y-4">
                     {data.preguntas_pendientes.length === 0 ? (
                       <p className="text-sm text-slate-400">No hay preguntas pendientes de revisión.</p>
                     ) : (
                       data.preguntas_pendientes.map((p) => (
-                        <div key={p.id} className="flex items-center justify-between rounded-xl bg-white/[0.02] p-3 border border-white/[0.04]">
-                          <span className="text-sm text-slate-300">{p.texto}</span>
-                          <span className="rounded bg-amber-500/10 px-2 py-1 text-xs text-amber-400">Pendiente</span>
+                        <div key={p.id} className="rounded-xl bg-white/[0.02] p-4 border border-white/[0.06]">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium text-white">{p.texto}</span>
+                            <span className="rounded bg-amber-500/10 px-2 py-0.5 text-xs text-amber-400 font-semibold">
+                              Pendiente
+                            </span>
+                          </div>
+                          
+                          {/* Formulario de respuesta */}
+                          <div className="mt-3">
+                            <textarea
+                              rows={2}
+                              className="w-full rounded-lg border border-white/10 bg-[#07111f] p-2.5 text-xs text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none"
+                              placeholder="Escribe la solución o respuesta para el pupilo..."
+                              value={respuestasTexto[p.id] || ""}
+                              onChange={(e) =>
+                                setRespuestasTexto({ ...respuestasTexto, [p.id]: e.target.value })
+                              }
+                            />
+                            <div className="mt-2 flex justify-end">
+                              <button
+                                onClick={() => enviarRespuesta(p.id)}
+                                disabled={enviandoId === p.id || !respuestasTexto[p.id]?.trim()}
+                                className="rounded-lg bg-purple-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-purple-500 disabled:opacity-40"
+                              >
+                                {enviandoId === p.id ? "Enviando..." : "Responder y Resolver"}
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       ))
                     )}
@@ -245,6 +306,7 @@ export default function AdminDashboard() {
                     )}
                   </div>
                 </div>
+
               </div>
             </>
           ) : null}

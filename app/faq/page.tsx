@@ -17,21 +17,22 @@ export default function FaqPage() {
   const [error, setError] = useState("");
   const [mensaje, setMensaje] = useState("");
 
-  useEffect(() => {
-    async function cargarPreguntas() {
-      try {
-        setPreguntas(await obtenerPreguntas());
-      } catch (reason) {
-        setError(
-          reason instanceof Error
-            ? reason.message
-            : "No se pudieron cargar las preguntas.",
-        );
-      } finally {
-        setCargando(false);
-      }
+  const cargarPreguntas = async () => {
+    try {
+      const data = await obtenerPreguntas();
+      setPreguntas(data);
+    } catch (reason) {
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : "No se pudieron cargar las preguntas."
+      );
+    } finally {
+      setCargando(false);
     }
+  };
 
+  useEffect(() => {
     void cargarPreguntas();
   }, []);
 
@@ -45,15 +46,16 @@ export default function FaqPage() {
     setEnviando(true);
 
     try {
-      const preguntaCreada = await crearPregunta(texto);
-
+      await crearPregunta(texto);
       setPregunta("");
-      setMensaje("Pregunta guardada en el backend.");
+      setMensaje("Pregunta guardada y enviada al QA Senior.");
+      // Recargamos el listado para que aparezca la nueva pregunta al instante
+      await cargarPreguntas();
     } catch (reason) {
       setError(
         reason instanceof Error
           ? reason.message
-          : "No se pudo guardar la pregunta.",
+          : "No se pudo guardar la pregunta."
       );
     } finally {
       setEnviando(false);
@@ -67,8 +69,8 @@ export default function FaqPage() {
         ← Volver al dashboard
       </Link>
 
-      <h1 className="mt-8  text-center text-3xl font-bold tracking-tight">
-        Preguntas frecuentes
+      <h1 className="mt-8 text-center text-3xl font-bold tracking-tight">
+        Preguntas frecuentes y Dudas al QA Senior
       </h1>
 
       <form onSubmit={handleSubmit} className="mt-8 flex flex-col items-center">
@@ -81,18 +83,19 @@ export default function FaqPage() {
           onChange={(e) => setPregunta(e.target.value)}
           type="text"
           required
-          placeholder="Escribe una pregunta"
-          className="w-full max-w-md rounded-lg border border-white/20 bg-[#0b192b] p-3 text-center text-white placeholder:text-slate-400"
+          placeholder="Escribe tu duda o pregunta aquí..."
+          className="w-full max-w-md rounded-lg border border-white/20 bg-[#0b192b] p-3 text-center text-white placeholder:text-slate-400 focus:border-sky-400 focus:outline-none"
         />
 
         <button
-          className="mt-4 rounded-lg bg-sky-400 px-6 py-2 font-bold text-slate-950 transition-colors hover:bg-sky-300"
+          className="mt-4 rounded-lg bg-sky-400 px-6 py-2 font-bold text-slate-950 transition-colors hover:bg-sky-300 disabled:opacity-50"
           type="submit"
           disabled={enviando}
         >
-          {enviando ? "Guardando..." : "Añadir pregunta"}
+          {enviando ? "Enviando..." : "Añadir pregunta"}
         </button>
       </form>
+
       {error && (
         <p
           role="alert"
@@ -101,6 +104,7 @@ export default function FaqPage() {
           {error}
         </p>
       )}
+
       {mensaje && (
         <p
           role="status"
@@ -109,6 +113,7 @@ export default function FaqPage() {
           {mensaje}
         </p>
       )}
+
       {cargando ? (
         <p role="status" className="mt-8 text-center text-sm text-slate-400">
           Cargando preguntas...

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import AppNavigation from "./components/AppNavigation";
+
 
 interface TestCase {
   id: string;
@@ -78,7 +78,7 @@ export default function Home() {
       </header>
 
       <div className="mx-auto flex max-w-[1600px]">
-        <AppNavigation activeHref="/" />
+      
 
         <section className="min-w-0 flex-1 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.10),transparent_34%)] p-6 lg:p-10">
           <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
