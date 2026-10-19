@@ -1,5 +1,5 @@
 // app/(dashboard)/layout.tsx
-import AppNavigation from "../components/AppNavigation";
+import AppNavigation from "../components/AppNavigation"; // 👈 1. Asegúrate de tener la importación
 import LogoutButton from "../components/LogoutButton";
 
 export default function DashboardLayout({
@@ -9,8 +9,8 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="flex min-h-screen">
-      {/* Menú lateral izquierdo (Solo visible en las páginas dentro de (dashboard)) */}
-      
+      {/* 👈 2. Restaura el componente del menú lateral aquí */}
+      <AppNavigation />
 
       <div className="flex flex-1 flex-col min-w-0">
         {/* Cabecera superior con Usuario y Cerrar Sesión */}
