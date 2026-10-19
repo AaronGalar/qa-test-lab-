@@ -15,6 +15,7 @@ const navigationItems = [
   { href: "/tareas", number: "04", label: "Lista de tareas", icon: "📋" },
   { href: "/faq", number: "05", label: "Preguntas frecuentes", icon: "💬" },
   { href: "/proyectos", number: "06", label: "Proyectos", icon: "📁" },
+  { href: "/fuentes", number: "07", label: "Fuentes y Tutoriales", icon: "📚" }
 ] as const;
 
 type AppNavigationProps = {

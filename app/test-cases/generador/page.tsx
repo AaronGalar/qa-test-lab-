@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import AppNavigation from "@/app/components/AppNavigation";
+
 import { crearTestCase } from "@/lib/api/test-cases";
 import {
   generarSugerencias,
@@ -140,7 +140,7 @@ export default function TestCaseGeneratorPage() {
       </header>
 
       <div className="mx-auto flex max-w-[1600px]">
-        <AppNavigation activeHref="/test-cases/generador" />
+      
 
         <section className="min-w-0 flex-1 p-6 lg:p-10">
           <div className="mx-auto max-w-4xl">
