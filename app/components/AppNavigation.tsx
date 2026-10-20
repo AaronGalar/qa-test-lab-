@@ -77,7 +77,7 @@ export default function AppNavigation() {
                     isActive ? "text-sky-400 opacity-100" : "text-slate-600 opacity-60 group-hover:opacity-100"
                   }`}
                 >
-                  {item.number}
+                 
                 </span>
 
                 {isActive && (
