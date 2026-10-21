@@ -98,9 +98,7 @@ export default function TestCaseGeneratorPage() {
 
       setMessage(
         `${savedIndices.length} ${
-          savedIndices.length === 1
-            ? "caso guardado en"
-            : "casos guardados en"
+          savedIndices.length === 1 ? "caso guardado en" : "casos guardados en"
         } la biblioteca.`,
       );
     } catch (reason) {
@@ -109,7 +107,9 @@ export default function TestCaseGeneratorPage() {
         savedIndices.length > 0
           ? ` Se guardaron ${savedIndices.length} casos antes del error.`
           : "";
-      setError(`No se pudieron guardar todos los casos: ${detail}${partialResult}`);
+      setError(
+        `No se pudieron guardar todos los casos: ${detail}${partialResult}`,
+      );
     } finally {
       setSelectedIndices((current) =>
         current.filter((index) => !savedIndices.includes(index)),
@@ -124,21 +124,17 @@ export default function TestCaseGeneratorPage() {
 
   return (
     <main className="min-h-screen bg-[#07111f] text-white antialiased">
-    
-
       <div className="mx-auto flex max-w-[1600px]">
-      
-
         <section className="min-w-0 flex-1 p-6 lg:p-10">
           <div className="mx-auto max-w-4xl">
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-sky-300/80">
               Herramienta guiada
-              <Link 
-    href="/" 
-    className="shrink-0 text-sm font-medium text-slate-400 hover:text-sky-400 transition-colors flex items-center gap-1.5"
-  >
-    ← Volver al inicio
-  </Link>
+              <Link
+                href="/"
+                className="shrink-0 text-sm font-medium text-slate-400 hover:text-sky-400 transition-colors flex items-center gap-1.5"
+              >
+                ← Volver al inicio
+              </Link>
             </p>
             <h2 className="text-3xl font-bold tracking-tight">
               Generador de escenarios QA
@@ -198,7 +194,9 @@ export default function TestCaseGeneratorPage() {
                 disabled={isGenerating || !featureName.trim()}
                 className="w-fit rounded-lg bg-sky-400 px-5 py-3 text-sm font-bold text-slate-950 transition-colors hover:bg-sky-300 disabled:cursor-not-allowed disabled:opacity-50 sm:col-span-2"
               >
-                {isGenerating ? "Preparando escenarios..." : "Generar escenarios"}
+                {isGenerating
+                  ? "Preparando escenarios..."
+                  : "Generar escenarios"}
               </button>
             </form>
 
@@ -214,10 +212,7 @@ export default function TestCaseGeneratorPage() {
             )}
 
             {suggestions.length > 0 && (
-              <section
-                aria-labelledby="suggestions-heading"
-                className="mt-8"
-              >
+              <section aria-labelledby="suggestions-heading" className="mt-8">
                 <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <h3

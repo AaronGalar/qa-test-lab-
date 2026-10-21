@@ -20,13 +20,13 @@ export default function LoginPage() {
 
     try {
       const data = await loginUsuario(email, password);
-      
+
       // 1. Guardar los datos esenciales en localStorage para que la app los reconozca
       localStorage.setItem("es_admin", data.es_admin ? "true" : "false");
-      if (data.token) {
-        localStorage.setItem("token", data.token);
+      if (data.access_token) {
+        localStorage.setItem("token", data.access_token);
       }
-      
+
       // 2. Redirigir correctamente según el rol
       if (data.es_admin) {
         router.push("/admin"); // O al panel de administración que corresponda

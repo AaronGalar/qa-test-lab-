@@ -25,7 +25,7 @@ export default function FaqPage() {
       setError(
         reason instanceof Error
           ? reason.message
-          : "No se pudieron cargar las preguntas."
+          : "No se pudieron cargar las preguntas.",
       );
     } finally {
       setCargando(false);
@@ -55,7 +55,7 @@ export default function FaqPage() {
       setError(
         reason instanceof Error
           ? reason.message
-          : "No se pudo guardar la pregunta."
+          : "No se pudo guardar la pregunta.",
       );
     } finally {
       setEnviando(false);

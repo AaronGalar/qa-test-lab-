@@ -36,9 +36,7 @@ async function mockTestCaseApi(page: Page) {
       return;
     }
 
-    const id = decodeURIComponent(
-      pathname.slice("/api/test-cases/".length),
-    );
+    const id = decodeURIComponent(pathname.slice("/api/test-cases/".length));
     const testCaseIndex = testCases.findIndex((testCase) => testCase.id === id);
 
     if (request.method() === "POST" && pathname === "/api/test-cases") {
@@ -69,9 +67,7 @@ async function mockTestCaseApi(page: Page) {
   });
 }
 
-test("el FAQ lee y crea preguntas en el backend", async ({
-  page,
-}) => {
+test("el FAQ lee y crea preguntas en el backend", async ({ page }) => {
   let payload: { texto: string } | undefined;
 
   await page.route("**/api/preguntas", async (route) => {
@@ -125,7 +121,9 @@ test("los IDs de caso siguen siendo únicos al borrar y volver a crear", async (
   await page.getByLabel("Título").fill("Comprobar un ID único");
   await page.getByLabel("Descripción").fill("Crear un caso tras borrar otro.");
   await page.getByRole("button", { name: "Guardar caso" }).click();
-  await expect(page.getByText("Caso TC-004 guardado correctamente.")).toBeVisible();
+  await expect(
+    page.getByText("Caso TC-004 guardado correctamente."),
+  ).toBeVisible();
 
   await page
     .getByRole("button", { name: "Eliminar caso de prueba TC-004" })
@@ -135,7 +133,9 @@ test("los IDs de caso siguen siendo únicos al borrar y volver a crear", async (
   await page.getByLabel("Descripción").fill("El ID eliminado no se reutiliza.");
   await page.getByRole("button", { name: "Guardar caso" }).click();
 
-  await expect(page.getByText("Caso TC-005 guardado correctamente.")).toBeVisible();
+  await expect(
+    page.getByText("Caso TC-005 guardado correctamente."),
+  ).toBeVisible();
 
   await page.reload();
   await expect(page.getByText("Campos obligatorios")).toBeVisible();

@@ -24,20 +24,27 @@ export default function AdminPreguntasPage() {
   return (
     <main className="min-h-screen bg-[#07111f] p-10 text-white">
       <p>
-         <Link href="/" className="text-sm text-slate-400 hover:text-white">
-        ← Volver al dashboard
-      </Link>
+        <Link href="/" className="text-sm text-slate-400 hover:text-white">
+          ← Volver al dashboard
+        </Link>
       </p>
-      <h1 className="text-2xl font-bold mb-6">Preguntas Pendientes de Revisión</h1>
+      <h1 className="text-2xl font-bold mb-6">
+        Preguntas Pendientes de Revisión
+      </h1>
 
       {cargando ? (
         <p>Cargando...</p>
       ) : pendientes.length === 0 ? (
-        <p className="text-slate-400">No hay preguntas pendientes por revisar.</p>
+        <p className="text-slate-400">
+          No hay preguntas pendientes por revisar.
+        </p>
       ) : (
         <ul className="space-y-3 max-w-xl">
           {pendientes.map((item) => (
-            <li key={item.id} className="p-4 bg-[#0b192b] border border-white/10 rounded-lg">
+            <li
+              key={item.id}
+              className="p-4 bg-[#0b192b] border border-white/10 rounded-lg"
+            >
               <p className="font-medium">{item.texto}</p>
               <span className="text-xs text-slate-400">ID: {item.id}</span>
             </li>

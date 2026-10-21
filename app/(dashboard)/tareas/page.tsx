@@ -92,7 +92,9 @@ export default function TareasPage() {
       await eliminarTareaEnApi(id);
       setTareas((actuales) => actuales.filter((tarea) => tarea.id !== id));
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Error al eliminar la tarea");
+      setError(
+        err instanceof Error ? err.message : "Error al eliminar la tarea",
+      );
     } finally {
       setEliminandoId(null);
     }

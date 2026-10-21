@@ -1,180 +1,150 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import ExportReportButton from "@/app/components/ExportReportButton";
+import { CasoPruebaExport } from "@/lib/api/exportUtils";
+import { obtenerTestCases, TestCase } from "@/lib/api/test-cases"; // 👈 Usamos la función correcta
 
-
-interface TestCase {
-  id: string;
-  title: string;
-  status: "PASS" | "FAIL";
-}
-
-interface DashboardData {
-  total: number;
-  superados: number;
-  atencion: number;
-  actividad: TestCase[];
-}
-
-export default function Home() {
-  const [data, setData] = useState<DashboardData>({
-    total: 0,
-    superados: 0,
-    atencion: 0,
-    actividad: [],
-  });
-  const [loading, setLoading] = useState(true);
-
-  const cargarResumen = () => {
-    fetch("http://localhost:8000/api/dashboard/resumen", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-      },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Error al cargar datos");
-        return res.json();
-      })
-      .then((result) => {
-        setData(result);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error al actualizar resumen:", err);
-        setLoading(false);
-      });
-  };
+export default function ResumenPage() {
+  const [casos, setCasos] = useState<CasoPruebaExport[]>([]);
+  const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    cargarResumen();
-    window.addEventListener("focus", cargarResumen);
-    return () => {
-      window.removeEventListener("focus", cargarResumen);
-    };
+    async function cargarDatos() {
+      try {
+        const data: TestCase[] = await obtenerTestCases();
+        
+        // Mapeamos los campos reales del backend (title, status, etc.) al formato del reporte
+        const casosFormateados: CasoPruebaExport[] = data.map((c) => ({
+          id: c.id,
+          titulo: c.title,
+          categoria: "Funcional", // O el campo de categoría si lo agregas luego
+          estado: c.status === "PASS" ? "Aprobado" : c.status === "FAIL" ? "Fallido" : "Pendiente",
+          prioridad: c.priority === "High" ? "Alta" : c.priority === "Medium" ? "Media" : "Baja",
+          fecha: new Date().toISOString().split("T")[0], // Fecha actual o la que devuelva tu backend
+        }));
+
+        setCasos(casosFormateados);
+      } catch (error) {
+        console.error("Error al cargar los casos de prueba:", error);
+      } finally {
+        setCargando(false);
+      }
+    }
+
+    cargarDatos();
   }, []);
 
-  return (
-    <main className="min-h-screen bg-[#07111f] text-white antialiased">
-      
+  // Calcular métricas basadas en los datos reales
+  const totales = casos.length;
+  const aprobados = casos.filter((c) => c.estado === "Aprobado").length;
+  const fallidos = casos.filter((c) => c.estado === "Fallido").length;
+  const tasaExito = totales > 0 ? ((aprobados / totales) * 100).toFixed(1) : "0.0";
 
-      <div className="mx-auto flex max-w-[1600px]">
-      
-
-        <section className="min-w-0 flex-1 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.10),transparent_34%)] p-6 lg:p-10">
-          <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-            <div>
-              <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-sky-300/80">
-                Vista general
-              </p>
-              <h2 className="text-3xl font-bold tracking-tight">
-                Resumen de calidad
-              </h2>
-              <p className="mt-2 max-w-xl text-sm text-slate-400">
-                Una lectura rápida del estado de tu suite y de las últimas
-                pruebas ejecutadas.
-              </p>
-            </div>
-
-            <Link
-              href="/test-cases"
-              className="inline-flex w-fit items-center gap-2 rounded-xl bg-sky-400 px-4 py-3 text-sm font-bold text-sky-950 shadow-[0_10px_30px_rgba(56,189,248,0.2)] hover:-translate-y-0.5 hover:bg-sky-300"
-            >
-              <span aria-hidden="true">+</span> Nuevo caso
-            </Link>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-3">
-            <StatCard title="Casos totales" value={loading ? "..." : String(data.total)} icon="01" tone="sky" />
-            <StatCard title="Superados" value={loading ? "..." : String(data.superados)} icon="02" tone="green" />
-            <StatCard title="Necesitan atención" value={loading ? "..." : String(data.atencion)} icon="03" tone="amber" />
-          </div>
-
-          <div className="mt-8 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0b192b]/80 shadow-2xl shadow-black/10">
-            <div className="flex items-center justify-between border-b border-white/[0.07] px-6 py-5">
-              <div>
-                <h3 className="font-semibold">Actividad reciente</h3>
-                <p className="mt-1 text-xs text-slate-500">Últimos casos ejecutados</p>
-              </div>
-              <span className="rounded-full border border-green-400/20 bg-green-400/10 px-3 py-1 text-xs font-semibold text-green-300">
-                Suite estable
-              </span>
-            </div>
-
-            <div>
-              {loading ? (
-                <p className="p-6 text-sm text-slate-400">Cargando actividad...</p>
-              ) : data.actividad.length === 0 ? (
-                <p className="p-6 text-sm text-slate-400">No hay casos de prueba registrados aún.</p>
-              ) : (
-                data.actividad.map((test) => (
-                  <TestRow key={test.id} id={test.id} title={test.title} status={test.status} />
-                ))
-              )}
-            </div>
-          </div>
-        </section>
+  if (cargando) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh] text-slate-400">
+        <p>Cargando informe de calidad...</p>
       </div>
-    </main>
-  );
-}
-
-function StatCard({
-  title,
-  value,
-  icon,
-  tone,
-}: {
-  title: string;
-  value: string;
-  icon: string;
-  tone: "sky" | "green" | "amber";
-}) {
-  const tones = {
-    sky: "border-sky-300/15 bg-sky-300/[0.07] text-sky-300",
-    green: "border-green-300/15 bg-green-300/[0.07] text-green-300",
-    amber: "border-amber-300/15 bg-amber-300/[0.07] text-amber-300",
-  };
+    );
+  }
 
   return (
-    <div className={`rounded-2xl border p-6 ${tones[tone]}`}>
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-300">{title}</p>
-        <span className="text-xs font-bold tracking-widest opacity-70">{icon}</span>
-      </div>
-      <p className="mt-5 text-4xl font-bold tracking-tight text-white">{value}</p>
-    </div>
-  );
-}
+    <div className="space-y-6">
+      {/* Encabezado del Informe */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-5">
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-sky-400">
+            Informe Ejecutivo de Calidad
+          </span>
+          <h1 className="text-2xl font-bold text-white mt-1">Resumen de Calidad QA</h1>
+          <p className="text-sm text-slate-400 mt-1">
+            Generado el {new Date().toLocaleDateString("es-ES", { year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
+        </div>
 
-function TestRow({
-  id,
-  title,
-  status,
-}: {
-  id: string;
-  title: string;
-  status: "PASS" | "FAIL";
-}) {
-  const passed = status === "PASS";
-
-  return (
-    <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4 last:border-b-0 hover:bg-white/[0.025]">
-      <div className="flex items-center gap-4">
-        <span className="rounded-md bg-white/[0.05] px-2 py-1 font-mono text-[11px] text-slate-500">
-          {id}
-        </span>
-        <span className="text-sm">{title}</span>
+        {/* Botón de exportación con datos reales y actualizados */}
+        <ExportReportButton casos={casos} />
       </div>
-      <span
-        className={
-          passed
-            ? "rounded-full bg-green-500/10 px-3 py-1 text-xs font-medium text-green-400"
-            : "rounded-full bg-red-500/10 px-3 py-1 text-xs font-medium text-red-400"
-        }
-      >
-        {status}
-      </span>
+
+      {/* Tarjetas de Métricas Principales */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="rounded-xl border border-white/10 bg-[#07111f]/60 p-5 shadow-lg">
+          <span className="text-xs text-slate-400 font-medium">Total de Casos</span>
+          <div className="text-3xl font-bold text-white mt-2">{totales}</div>
+        </div>
+
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.03] p-5 shadow-lg">
+          <span className="text-xs text-emerald-400 font-medium">Aprobados (Pass)</span>
+          <div className="text-3xl font-bold text-emerald-400 mt-2">{aprobados}</div>
+        </div>
+
+        <div className="rounded-xl border border-rose-500/20 bg-rose-500/[0.03] p-5 shadow-lg">
+          <span className="text-xs text-rose-400 font-medium">Fallidos (Fail)</span>
+          <div className="text-3xl font-bold text-rose-400 mt-2">{fallidos}</div>
+        </div>
+
+        <div className="rounded-xl border border-sky-500/20 bg-sky-500/[0.03] p-5 shadow-lg">
+          <span className="text-xs text-sky-400 font-medium">Tasa de Éxito</span>
+          <div className="text-3xl font-bold text-sky-300 mt-2">{tasaExito}%</div>
+        </div>
+      </div>
+
+      {/* Tabla Ejecutiva de Resultados */}
+      <div className="rounded-xl border border-white/10 bg-[#07111f]/80 overflow-hidden shadow-xl">
+        <div className="p-4 border-b border-white/10 bg-white/[0.02]">
+          <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+            Detalle de Casos de Prueba Registrados
+          </h2>
+        </div>
+        
+        <div className="overflow-x-auto">
+          {casos.length === 0 ? (
+            <div className="p-8 text-center text-slate-400 text-sm">
+              No hay casos de prueba registrados todavía. ¡Crea uno nuevo para ver las métricas aquí!
+            </div>
+          ) : (
+            <table className="w-full text-left text-xs text-slate-300">
+              <thead className="bg-white/[0.04] text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-white/10">
+                <tr>
+                  <th className="p-3.5">ID</th>
+                  <th className="p-3.5">Caso de Prueba</th>
+                  <th className="p-3.5">Categoría</th>
+                  <th className="p-3.5">Prioridad</th>
+                  <th className="p-3.5">Estado</th>
+                  <th className="p-3.5">Fecha</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {casos.map((caso) => (
+                  <tr key={caso.id} className="hover:bg-white/[0.02]">
+                    <td className="p-3.5 font-mono text-slate-400">{caso.id}</td>
+                    <td className="p-3.5 font-medium text-white">{caso.titulo}</td>
+                    <td className="p-3.5 text-slate-400">{caso.categoria}</td>
+                    <td className="p-3.5">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                        {caso.prioridad}
+                      </span>
+                    </td>
+                    <td className="p-3.5">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
+                        caso.estado === "Aprobado"
+                          ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                          : caso.estado === "Fallido"
+                          ? "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                          : "bg-slate-500/10 text-slate-400 border border-slate-500/20"
+                      }`}>
+                        {caso.estado}
+                      </span>
+                    </td>
+                    <td className="p-3.5 text-slate-400 font-mono">{caso.fecha}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

@@ -27,7 +27,9 @@ export default function GeneradorProyecto() {
   // ----------------------------------------------------
   // ESTADOS PARA EL MODO EDICIÓN
   // ----------------------------------------------------
-  const [proyectoEnEdicion, setProyectoEnEdicion] = useState<Proyecto | null>(null);
+  const [proyectoEnEdicion, setProyectoEnEdicion] = useState<Proyecto | null>(
+    null,
+  );
   const [editNombre, setEditNombre] = useState("");
   const [editDescripcion, setEditDescripcion] = useState("");
   const [editFechaInicio, setEditFechaInicio] = useState("");
@@ -93,17 +95,22 @@ export default function GeneradorProyecto() {
     if (!proyectoEnEdicion) return;
 
     try {
-      const proyectoActualizado = await actualizarProyecto(proyectoEnEdicion.id, {
-        name: editNombre,
-        description: editDescripcion,
-        fecha_inicio: editFechaInicio || undefined,
-        ultimo_testing: editUltimoTesting || undefined,
-        detalles_testing: editDetallesTesting || undefined,
-      });
+      const proyectoActualizado = await actualizarProyecto(
+        proyectoEnEdicion.id,
+        {
+          name: editNombre,
+          description: editDescripcion,
+          fecha_inicio: editFechaInicio || undefined,
+          ultimo_testing: editUltimoTesting || undefined,
+          detalles_testing: editDetallesTesting || undefined,
+        },
+      );
 
       // Actualizamos la lista reemplazando solo el proyecto modificado
       setProyectos(
-        proyectos.map((p) => (p.id === proyectoEnEdicion.id ? proyectoActualizado : p))
+        proyectos.map((p) =>
+          p.id === proyectoEnEdicion.id ? proyectoActualizado : p,
+        ),
       );
 
       // Salimos del modo edición
@@ -134,7 +141,6 @@ export default function GeneradorProyecto() {
       </h1>
 
       <div className="mx-auto mt-8 max-w-4xl space-y-10">
-
         {/* ======================================================= */}
         {/* FORMULARIO PARA CREAR PROYECTO                          */}
         {/* ======================================================= */}
@@ -377,7 +383,6 @@ export default function GeneradorProyecto() {
             })}
           </div>
         </div>
-
       </div>
     </main>
   );

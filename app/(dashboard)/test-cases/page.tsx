@@ -183,11 +183,7 @@ export default function TestCasesPage() {
 
   return (
     <main className="min-h-screen bg-[#07111f] text-white antialiased">
-      
-
       <div className="mx-auto flex max-w-[1600px]">
-       
-
         <section className="min-w-0 flex-1 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.10),transparent_34%)] p-6 lg:p-10">
           <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
             <div>
