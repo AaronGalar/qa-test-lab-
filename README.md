@@ -1,5 +1,5 @@
 <div align="center">
-	<h1>QA Test Lab</h1>
+	<h1>QAlidad</h1>
 	<p><strong>Diseña casos. Explora flujos. Convierte pruebas reales en vídeo.</strong></p>
 	<p>Un laboratorio visual para practicar QA de principio a fin, desde el primer clic hasta el MP4 final.</p>
 	<p>

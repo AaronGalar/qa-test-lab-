@@ -434,7 +434,7 @@ const LoginScreen: React.FC<{ frame: number }> = ({ frame }) => {
           >
             ✦
           </div>
-          <div style={{ fontSize: 31, fontWeight: 800 }}>QA Test Lab</div>
+          <div style={{ fontSize: 31, fontWeight: 800 }}>QAlidad</div>
           <div style={{ marginTop: 7, color: colors.muted, fontSize: 15 }}>
             Entra en tu espacio de calidad
           </div>

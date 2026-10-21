@@ -2,7 +2,7 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "QA Test Lab",
+  title: "QAlidad",
   description: "Tu espacio de pruebas",
 };
 

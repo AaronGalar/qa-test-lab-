@@ -20,7 +20,7 @@ export default function DashboardLayout({
               ❖
             </div>
             <div>
-              <h1 className="text-sm font-bold text-white tracking-wide">QA Test Lab</h1>
+              <h1 className="text-sm font-bold text-white tracking-wide">QAlidad</h1>
               <p className="text-[11px] text-slate-400">Tu espacio de pruebas</p>
             </div>
           </div>
