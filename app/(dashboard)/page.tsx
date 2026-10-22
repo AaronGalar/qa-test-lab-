@@ -1,150 +1,157 @@
+// app/(dashboard)/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import ExportReportButton from "@/app/components/ExportReportButton";
-import { CasoPruebaExport } from "@/lib/api/exportUtils";
-import { obtenerTestCases, TestCase } from "@/lib/api/test-cases"; // 👈 Usamos la función correcta
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { obtenerProyectos, type Proyecto } from "@/lib/api/proyectos";
+import LogoutButton from "@/app/components/LogoutButton";
 
-export default function ResumenPage() {
-  const [casos, setCasos] = useState<CasoPruebaExport[]>([]);
+export default function PantallaPrincipalPage() {
+  const [proyectos, setProyectos] = useState<Proyecto[]>([]);
   const [cargando, setCargando] = useState(true);
 
-  useEffect(() => {
-    async function cargarDatos() {
-      try {
-        const data: TestCase[] = await obtenerTestCases();
-        
-        // Mapeamos los campos reales del backend (title, status, etc.) al formato del reporte
-        const casosFormateados: CasoPruebaExport[] = data.map((c) => ({
-          id: c.id,
-          titulo: c.title,
-          categoria: "Funcional", // O el campo de categoría si lo agregas luego
-          estado: c.status === "PASS" ? "Aprobado" : c.status === "FAIL" ? "Fallido" : "Pendiente",
-          prioridad: c.priority === "High" ? "Alta" : c.priority === "Medium" ? "Media" : "Baja",
-          fecha: new Date().toISOString().split("T")[0], // Fecha actual o la que devuelva tu backend
-        }));
+  // 👈 Poniendo esAdmin en false ya no te saldrá el cartel ni el botón de Admin
+  const [esAdmin, setEsAdmin] = useState<boolean>(false); 
 
-        setCasos(casosFormateados);
-      } catch (error) {
-        console.error("Error al cargar los casos de prueba:", error);
+  useEffect(() => {
+    async function cargar() {
+      try {
+        const data = await obtenerProyectos();
+        setProyectos(data);
+      } catch (err) {
+        console.error(err);
       } finally {
         setCargando(false);
       }
     }
-
-    cargarDatos();
+    void cargar();
   }, []);
 
-  // Calcular métricas basadas en los datos reales
-  const totales = casos.length;
-  const aprobados = casos.filter((c) => c.estado === "Aprobado").length;
-  const fallidos = casos.filter((c) => c.estado === "Fallido").length;
-  const tasaExito = totales > 0 ? ((aprobados / totales) * 100).toFixed(1) : "0.0";
-
-  if (cargando) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh] text-slate-400">
-        <p>Cargando informe de calidad...</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      {/* Encabezado del Informe */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-5">
-        <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-sky-400">
-            Informe Ejecutivo de Calidad
-          </span>
-          <h1 className="text-2xl font-bold text-white mt-1">Resumen de Calidad QA</h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Generado el {new Date().toLocaleDateString("es-ES", { year: 'numeric', month: 'long', day: 'numeric' })}
-          </p>
-        </div>
+    <main className="min-h-screen bg-gradient-to-br from-[#050b14] via-[#07111f] to-[#0a192f] p-8 text-white flex flex-col justify-between antialiased lg:p-12">
+      
+      {/* Cabecera limpia sin modo Admin */}
+      {/* Cabecera */}
+<div className="flex items-center justify-between">
+  <div className="flex items-center gap-3">
+    <span className="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">
+      Pantalla Principal
+    </span>
+    
+  </div>
 
-        {/* Botón de exportación con datos reales y actualizados */}
-        <ExportReportButton casos={casos} />
-      </div>
+  <div className="flex items-center gap-4">
+    {/* Panel Admin solo para administradores */}
+    {esAdmin && (
+      <Link
+        href="/admin"
+        className="text-xs font-medium text-purple-400 hover:text-purple-300 transition-colors bg-purple-500/10 px-3.5 py-1.5 rounded-lg border border-purple-500/30 flex items-center gap-1.5 shadow-sm"
+      >
+        <span>🛡️</span>
+        <span>Panel Admin</span>
+      </Link>
+    )}
 
-      {/* Tarjetas de Métricas Principales */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="rounded-xl border border-white/10 bg-[#07111f]/60 p-5 shadow-lg">
-          <span className="text-xs text-slate-400 font-medium">Total de Casos</span>
-          <div className="text-3xl font-bold text-white mt-2">{totales}</div>
-        </div>
-
-        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.03] p-5 shadow-lg">
-          <span className="text-xs text-emerald-400 font-medium">Aprobados (Pass)</span>
-          <div className="text-3xl font-bold text-emerald-400 mt-2">{aprobados}</div>
-        </div>
-
-        <div className="rounded-xl border border-rose-500/20 bg-rose-500/[0.03] p-5 shadow-lg">
-          <span className="text-xs text-rose-400 font-medium">Fallidos (Fail)</span>
-          <div className="text-3xl font-bold text-rose-400 mt-2">{fallidos}</div>
-        </div>
-
-        <div className="rounded-xl border border-sky-500/20 bg-sky-500/[0.03] p-5 shadow-lg">
-          <span className="text-xs text-sky-400 font-medium">Tasa de Éxito</span>
-          <div className="text-3xl font-bold text-sky-300 mt-2">{tasaExito}%</div>
-        </div>
-      </div>
-
-      {/* Tabla Ejecutiva de Resultados */}
-      <div className="rounded-xl border border-white/10 bg-[#07111f]/80 overflow-hidden shadow-xl">
-        <div className="p-4 border-b border-white/10 bg-white/[0.02]">
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider">
-            Detalle de Casos de Prueba Registrados
-          </h2>
-        </div>
-        
-        <div className="overflow-x-auto">
-          {casos.length === 0 ? (
-            <div className="p-8 text-center text-slate-400 text-sm">
-              No hay casos de prueba registrados todavía. ¡Crea uno nuevo para ver las métricas aquí!
-            </div>
-          ) : (
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-white/[0.04] text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-white/10">
-                <tr>
-                  <th className="p-3.5">ID</th>
-                  <th className="p-3.5">Caso de Prueba</th>
-                  <th className="p-3.5">Categoría</th>
-                  <th className="p-3.5">Prioridad</th>
-                  <th className="p-3.5">Estado</th>
-                  <th className="p-3.5">Fecha</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {casos.map((caso) => (
-                  <tr key={caso.id} className="hover:bg-white/[0.02]">
-                    <td className="p-3.5 font-mono text-slate-400">{caso.id}</td>
-                    <td className="p-3.5 font-medium text-white">{caso.titulo}</td>
-                    <td className="p-3.5 text-slate-400">{caso.categoria}</td>
-                    <td className="p-3.5">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                        {caso.prioridad}
-                      </span>
-                    </td>
-                    <td className="p-3.5">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
-                        caso.estado === "Aprobado"
-                          ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                          : caso.estado === "Fallido"
-                          ? "bg-rose-500/10 text-rose-400 border border-rose-500/20"
-                          : "bg-slate-500/10 text-slate-400 border border-slate-500/20"
-                      }`}>
-                        {caso.estado}
-                      </span>
-                    </td>
-                    <td className="p-3.5 text-slate-400 font-mono">{caso.fecha}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </div>
+    {/* Nombre de usuario */}
+    <div className="flex items-center gap-2 bg-white/[0.05] border border-white/10 px-3 py-1.5 rounded-full">
+      <span className="h-2 w-2 rounded-full bg-emerald-400" />
+      <span className="text-xs font-medium text-slate-300">
+        Aarón {esAdmin && <span className="text-[10px] text-purple-400 font-mono">(Admin)</span>}
+      </span>
     </div>
+
+    {/* Botón de cerrar sesión recuperado */}
+    <LogoutButton />
+  </div>
+</div>
+
+      {/* Título */}
+      <div className="my-8">
+        <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight text-white">
+          QAlidad
+        </h1>
+        <p className="text-sm text-slate-400 mt-2">
+          Selecciona un espacio de trabajo o consulta las guías del sistema.
+        </p>
+      </div>
+
+      {/* Las 3 Tarjetas Principales */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-auto">
+        
+        {/* Tarjeta 1: Fuentes */}
+        <Link
+          href="/fuentes"
+          className="group relative rounded-2xl border border-white/15 bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-8 shadow-2xl hover:border-sky-400/50 flex flex-col justify-between min-h-[280px]"
+        >
+          <div>
+            <span className="text-3xl">📚</span>
+            <h2 className="text-xl font-bold text-white mt-4 group-hover:text-sky-300">
+              Fuentes, cómo hacer informe
+            </h2>
+            <p className="text-xs text-slate-400 mt-2">
+              Documentación oficial y guías prácticas para QA.
+            </p>
+          </div>
+          <div className="mt-6 text-xs font-semibold text-sky-400">
+            Consultar guías →
+          </div>
+        </Link>
+
+        {/* Tarjeta 2: Proyectos */}
+        <div className="group relative rounded-2xl border border-sky-500/30 bg-gradient-to-b from-sky-500/[0.08] to-white/[0.02] p-8 shadow-2xl flex flex-col justify-between min-h-[280px]">
+          <div>
+            <span className="text-3xl">🚀</span>
+            <h2 className="text-xl font-bold text-white mt-4">Tus Proyectos de QA</h2>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {cargando ? (
+                <span className="text-xs text-slate-400">Cargando...</span>
+              ) : proyectos.length === 0 ? (
+                <span className="text-xs text-slate-400">No hay proyectos todavía</span>
+              ) : (
+                proyectos.slice(0, 3).map((p) => (
+                  <Link
+                    key={p.id}
+                    href={`/proyectos/${p.id}/resumen`}
+                    className="text-xs font-medium px-3 py-1.5 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30 hover:bg-sky-500/30"
+                  >
+                    {(p as any).nombre || (p as any).name || "Proyecto"}
+                  </Link>
+                ))
+              )}
+            </div>
+          </div>
+
+          <div className="mt-6 flex items-center justify-between">
+            <Link href="/proyectos" className="text-xs font-semibold text-sky-400 hover:underline">
+              Ver todos →
+            </Link>
+          </div>
+        </div>
+
+        {/* Tarjeta 3: Pregunta al Senior */}
+        <Link
+          href="/faq"
+          className="group relative rounded-2xl border border-white/15 bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-8 shadow-2xl hover:border-sky-400/50 flex flex-col justify-between min-h-[280px]"
+        >
+          <div>
+            <span className="text-3xl">💡</span>
+            <h2 className="text-xl font-bold text-white mt-4 group-hover:text-sky-300">
+              Pregunta al senior
+            </h2>
+            <p className="text-xs text-slate-400 mt-2">
+              Resuelve dudas técnicas sobre automatización y calidad.
+            </p>
+          </div>
+          <div className="mt-6 text-xs font-semibold text-sky-400">
+            Abrir consultas →
+          </div>
+        </Link>
+
+      </div>
+
+      <div className="text-center text-xs text-slate-500 mt-8">
+        Made by Aaron Galar
+      </div>
+    </main>
   );
 }

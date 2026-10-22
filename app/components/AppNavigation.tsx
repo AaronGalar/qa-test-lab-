@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"; // 👈 Hook para obtener la ruta
 import { useEffect, useState } from "react";
 
 const navigationItems = [
-  { href: "/", label: "Resumen",icon : "1"  },
+  { href: "/resumen", label: "Resumen",icon : "1"  },
   { href: "/test-cases",  label: "Casos de prueba",icon : "2" },
   {
     href: "/test-cases/generador",
@@ -19,6 +19,7 @@ const navigationItems = [
   { href: "/proyectos",  label: "Proyectos",icon : "6" },
   { href: "/fuentes", label: "Fuentes y Tutoriales",icon : "7" },
   { href: "/ai-testing", label: "Testing de IAs & Chats",icon : "8" },
+   { href: "/", label:"Pantalla principal",icon : "9" },
 ] as const;
 
 export default function AppNavigation() {
