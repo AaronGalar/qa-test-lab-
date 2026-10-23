@@ -6,18 +6,19 @@ import { useEffect, useState } from "react";
 
 const navigationItems = [
   { href: "/resumen", label: "Resumen",icon : "1"  },
-  { href: "/test-cases",  label: "Casos de prueba",icon : "2" },
+   { href: "/fuentes", label: "Fuentes y Tutoriales",icon : "2" },
+  { href: "/test-cases",  label: "Casos de prueba",icon : "3" },
   {
     href: "/test-cases/generador",
 
     label: "Generador de escenarios",
-    icon : "3" 
+    icon : "4" 
     
   },
-  { href: "/tareas", label: "Lista de tareas",icon : "4" },
-  { href: "/faq", label: "Preguntas frecuentes",icon : "5"  },
-  { href: "/proyectos",  label: "Proyectos",icon : "6" },
-  { href: "/fuentes", label: "Fuentes y Tutoriales",icon : "7" },
+  { href: "/tareas", label: "Lista de tareas",icon : "5" },
+  { href: "/faq", label: "Preguntas frecuentes",icon : "6"  },
+  { href: "/proyectos",  label: "Proyectos",icon : "7" },
+ 
   { href: "/ai-testing", label: "Testing de IAs & Chats",icon : "8" },
    { href: "/", label:"Pantalla principal",icon : "9" },
 ] as const;
