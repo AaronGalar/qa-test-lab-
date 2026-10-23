@@ -83,6 +83,7 @@ export default function FaqPage() {
   };
 
   // Filtrado optimizado y tolerante a formatos de fecha
+ // Filtrado coherente por fecha y texto
   const preguntasFiltradas = preguntas.filter((p: any) => {
     const textoPregunta = p.texto || p.pregunta || p.title || "";
     const coincideTexto = textoPregunta
@@ -92,7 +93,28 @@ export default function FaqPage() {
     if (!fechaFiltro) return coincideTexto;
 
     const rawFecha = p.fecha || p.createdAt || p.created_at || p.fecha_creacion || p.date;
-    const fechaItem = rawFecha ? rawFecha.split("T")[0] : new Date().toISOString().split("T")[0];
+    let fechaItem = "";
+
+    if (rawFecha) {
+      if (typeof rawFecha === "string" && rawFecha.includes("-")) {
+        fechaItem = rawFecha.split("T")[0];
+      } else if (typeof rawFecha === "string" && rawFecha.includes("/")) {
+        const partes = rawFecha.split("/");
+        if (partes.length === 3) {
+          fechaItem = `${partes[2]}-${partes[1].padStart(2, "0")}-${partes[0].padStart(2, "0")}`;
+        }
+      } else {
+        try {
+          fechaItem = new Date(rawFecha).toISOString().split("T")[0];
+        } catch (e) {
+          fechaItem = "";
+        }
+      }
+    }
+
+    if (!fechaItem) {
+      fechaItem = new Date().toISOString().split("T")[0];
+    }
 
     return coincideTexto && fechaItem === fechaFiltro;
   });

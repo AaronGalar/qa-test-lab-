@@ -15,11 +15,31 @@ export default function Respuestas({ preguntas }: { preguntas: Pregunta[] }) {
       {preguntas.map((p: any) => {
         const esRespondida = p.estado === "Respondida";
         
-        // Extraemos la fecha para mostrarla visualmente
+        // 1. Intentamos obtener cualquier propiedad de fecha real que envíe la API
         const rawFecha = p.fecha || p.createdAt || p.created_at || p.fecha_creacion || p.date;
-        let fechaMostrar = "Hoy";
+        
+        let fechaFormateada = "";
+
         if (rawFecha) {
-          fechaMostrar = typeof rawFecha === "string" ? rawFecha.split("T")[0] : new Date(rawFecha).toISOString().split("T")[0];
+          if (typeof rawFecha === "string" && rawFecha.includes("-")) {
+            fechaFormateada = rawFecha.split("T")[0];
+          } else if (typeof rawFecha === "string" && rawFecha.includes("/")) {
+            const partes = rawFecha.split("/");
+            if (partes.length === 3) {
+              fechaFormateada = `${partes[2]}-${partes[1].padStart(2, "0")}-${partes[0].padStart(2, "0")}`;
+            }
+          } else {
+            try {
+              fechaFormateada = new Date(rawFecha).toISOString().split("T")[0];
+            } catch (e) {
+              fechaFormateada = "";
+            }
+          }
+        }
+
+        // Si la pregunta viene sin fecha de la API, usamos la fecha de hoy en formato YYYY-MM-DD
+        if (!fechaFormateada) {
+          fechaFormateada = new Date().toISOString().split("T")[0];
         }
 
         return (
@@ -34,12 +54,12 @@ export default function Respuestas({ preguntas }: { preguntas: Pregunta[] }) {
                   <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400">
                     CONSULTA DE QA
                   </span>
-                  <span className="text-[10px] font-mono text-slate-500 bg-white/[0.03] px-2 py-0.5 rounded border border-white/5">
-                    📅 {fechaMostrar}
+                  <span className="text-[10px] font-mono text-slate-400 bg-white/[0.05] px-2 py-0.5 rounded border border-white/10">
+                    📅 {fechaFormateada}
                   </span>
                 </div>
                 <p className="text-sm font-semibold text-white leading-relaxed">
-                  {p.texto}
+                  {p.texto || p.pregunta}
                 </p>
               </div>
 
@@ -57,7 +77,7 @@ export default function Respuestas({ preguntas }: { preguntas: Pregunta[] }) {
               </div>
             </div>
 
-            {/* Si ya está respondida, mostramos la contestación del Senior */}
+            {/* Respuesta del Senior */}
             {esRespondida && p.respuesta && (
               <div className="mt-4 rounded-xl border border-sky-500/20 bg-sky-500/[0.04] p-4 space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
