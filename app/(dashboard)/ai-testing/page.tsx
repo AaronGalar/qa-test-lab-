@@ -74,12 +74,7 @@ export default function AITestingPage() {
             Matriz de pruebas y validaciones clave para modelos de lenguaje (LLMs) y asistentes conversacionales.
           </p>
         </div>
-        <Link
-          href="/"
-          className="shrink-0 text-sm font-medium text-slate-400 hover:text-sky-400 transition-colors flex items-center gap-1.5"
-        >
-          ← Volver al inicio
-        </Link>
+        
       </div>
 
       {/* Filtros por categoría */}

@@ -129,12 +129,7 @@ export default function TestCaseGeneratorPage() {
           <div className="mx-auto max-w-4xl">
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-sky-300/80">
               Herramienta guiada
-              <Link
-                href="/"
-                className="shrink-0 text-sm font-medium text-slate-400 hover:text-sky-400 transition-colors flex items-center gap-1.5"
-              >
-                ← Volver al inicio
-              </Link>
+              
             </p>
             <h2 className="text-3xl font-bold tracking-tight">
               Generador de escenarios QA

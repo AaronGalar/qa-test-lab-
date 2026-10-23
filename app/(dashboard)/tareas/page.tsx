@@ -104,10 +104,7 @@ export default function TareasPage() {
     <main className="min-h-screen bg-[#07111f] p-6 text-white antialiased lg:p-10">
       <div className="mx-auto max-w-[1200px]">
         {/* Enlace de navegación de Next.js */}
-        <Link href="/" className="text-sm text-slate-400 hover:text-white">
-          ← Volver al dashboard
-        </Link>
-
+      
         <h1 className="mt-8 text-3xl font-bold tracking-tight">
           Lista de tareas
         </h1>

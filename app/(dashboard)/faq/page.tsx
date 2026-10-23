@@ -124,13 +124,7 @@ export default function FaqPage() {
       
       {/* Botón Volver y Encabezado */}
       <div className="space-y-3 border-b border-white/10 pb-6">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-sky-400 transition-colors"
-        >
-          <span>←</span>
-          <span>Volver al dashboard</span>
-        </Link>
+        
 
         <div>
           <span className="text-xs font-semibold uppercase tracking-wider text-sky-400">

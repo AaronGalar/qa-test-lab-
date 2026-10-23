@@ -23,11 +23,7 @@ export default function AdminPreguntasPage() {
 
   return (
     <main className="min-h-screen bg-[#07111f] p-10 text-white">
-      <p>
-        <Link href="/" className="text-sm text-slate-400 hover:text-white">
-          ← Volver al dashboard
-        </Link>
-      </p>
+     
       <h1 className="text-2xl font-bold mb-6">
         Preguntas Pendientes de Revisión
       </h1>
