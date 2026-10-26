@@ -22,9 +22,10 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-[#07111f]">
+    // CONTENEDOR CLAVE: h-screen y overflow-hidden fuerzan a que ocupe exactamente toda la ventana
+    <div className="flex h-screen w-full bg-[#07111f] overflow-hidden">
       <AppNavigation />
-      {/* Añadimos px-8 para separar el contenido hacia la derecha */}
+      {/* El contenido de la derecha tiene scroll propio */}
       <div className="flex-1 overflow-y-auto px-8 py-6">{children}</div>
     </div>
   );

@@ -1,64 +1,37 @@
-import { apiRequest } from "./client";
-
+// lib/api/preguntas.ts
 export interface Pregunta {
-  id: number;
-  texto: string;
-  creado_por?: string;
+  id: string;
+  pregunta: string;
   respuesta?: string;
+  estado: "Pendiente" | "Respondida";
+  fecha: string; // Formato YYYY-MM-DD
   respondido_por?: string;
-  estado?: string;
 }
 
-// 1. Obtener las preguntas enviando siempre el Token del usuario logueado
-export async function obtenerPreguntas(): Promise<Pregunta[]> {
-  const token = localStorage.getItem("token") || "";
+const STORAGE_KEY = "qa_saas_preguntas";
+
+export function obtenerPreguntas(): Pregunta[] {
+  if (typeof window === "undefined") return [];
+  const guardadas = localStorage.getItem(STORAGE_KEY);
+  return guardadas ? JSON.parse(guardadas) : [];
+}
+
+export function guardarNuevaPregunta(textoPregunta: string, fechaPersonalizada?: string): Pregunta[] {
+  const actuales = obtenerPreguntas();
   
-  const res = await fetch("http://localhost:8000/api/preguntas", {
-    headers: {
-      "Authorization": `Bearer ${token}`
-    }
-  });
+  // Usamos la fecha indicada o, por defecto, el día actual en formato YYYY-MM-DD
+  const fechaFinal = fechaPersonalizada || new Date().toISOString().split("T")[0];
 
-  if (!res.ok) {
-    throw new Error("No se pudieron cargar las preguntas");
+  const nueva: Pregunta = {
+    id: Date.now().toString(),
+    pregunta: textoPregunta,
+    estado: "Pendiente",
+    fecha: fechaFinal,
+  };
+
+  const actualizadas = [nueva, ...actuales];
+  if (typeof window !== "undefined") {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(actualizadas));
   }
-
-  return res.json();
-}
-
-// 2. Crear la pregunta enviando también el Token para que se guarde tu email
-export async function crearPregunta(texto: string): Promise<any> {
-  const token = localStorage.getItem("token") || "";
-
-  const res = await fetch("http://localhost:8000/api/preguntas", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
-    body: JSON.stringify({ texto })
-  });
-
-  if (!res.ok) {
-    throw new Error("No se pudo enviar la pregunta");
-  }
-
-  return res.json();
-}
-
-// 3. Obtener las pendientes para el Admin
-export async function obtenerPreguntasPendientes(): Promise<Pregunta[]> {
-  const token = localStorage.getItem("token") || "";
-
-  const res = await fetch("http://localhost:8000/api/admin/preguntas-pendientes", {
-    headers: {
-      "Authorization": `Bearer ${token}`
-    }
-  });
-
-  if (!res.ok) {
-    throw new Error("Error al cargar las preguntas pendientes");
-  }
-
-  return res.json();
+  return actualizadas;
 }

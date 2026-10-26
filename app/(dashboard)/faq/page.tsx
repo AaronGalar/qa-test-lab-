@@ -1,108 +1,48 @@
 // app/faq/page.tsx
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
-import Link from "next/link";
-import {
-  crearPregunta,
-  obtenerPreguntas,
-  type Pregunta,
-} from "@/lib/api/preguntas";
+import { useState, useEffect } from "react";
 import Respuestas from "./respuestas";
+import { obtenerPreguntas, guardarNuevaPregunta, Pregunta } from "@/lib/api/preguntas";
 
-export default function FaqPage() {
-  const [pregunta, setPregunta] = useState("");
+export default function FAQPage() {
   const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
-  const [cargando, setCargando] = useState(true);
-  const [enviando, setEnviando] = useState(false);
-  const [error, setError] = useState("");
-  const [mensaje, setMensaje] = useState("");
-
+  const [nuevaPregunta, setNuevaPregunta] = useState("");
   const [busqueda, setBusqueda] = useState("");
   const [fechaFiltro, setFechaFiltro] = useState("");
-
-  const cargarPreguntas = async () => {
-    try {
-      const data = await obtenerPreguntas();
-      if (data && data.length > 0) {
-        setPreguntas(data);
-      }
-    } catch (reason) {
-      setError(
-        reason instanceof Error
-          ? reason.message
-          : "No se pudieron cargar las preguntas."
-      );
-    } finally {
-      setCargando(false);
-    }
-  };
+  const [mensajeEnviado, setMensajeEnviado] = useState(false);
 
   useEffect(() => {
-    void cargarPreguntas();
+    setPreguntas(obtenerPreguntas());
   }, []);
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleEnviarConsulta = (e: React.FormEvent) => {
     e.preventDefault();
-    const texto = pregunta.trim();
-    if (texto === "") return;
+    if (!nuevaPregunta.trim()) return;
 
-    setError("");
-    setMensaje("");
-    setEnviando(true);
-
-    try {
-      await crearPregunta(texto);
-
-      // Actualización optimista local para que aparezca al instante
-      const fechaHoy = new Date().toISOString().split("T")[0];
-      const nuevaPreguntaLocal: any = {
-        id: Date.now(),
-        texto: texto,
-        estado: "Pendiente",
-        respuesta: "",
-        respondido_por: "",
-        fecha: fechaHoy,
-      };
-
-      setPreguntas((prev) => [nuevaPreguntaLocal, ...prev]);
-      setPregunta("");
-      setMensaje("Pregunta guardada y enviada al QA Senior.");
-
-      // Intentamos sincronizar con la API de fondo
-      await cargarPreguntas();
-    } catch (reason) {
-      setError(
-        reason instanceof Error
-          ? reason.message
-          : "No se pudo guardar la pregunta."
-      );
-    } finally {
-      setEnviando(false);
-    }
+    // Guardamos la pregunta fijando la fecha de creación real
+    const actualizadas = guardarNuevaPregunta(nuevaPregunta);
+    setPreguntas(actualizadas);
+    setNuevaPregunta("");
+    
+    setMensajeEnviado(true);
+    setTimeout(() => setMensajeEnviado(false), 3000);
   };
 
-  // Filtrado optimizado y tolerante a formatos de fecha
- // Filtrado coherente por fecha y texto
+  // Filtrado preciso respetando la fecha asignada
   const preguntasFiltradas = preguntas.filter((p: any) => {
-    const textoPregunta = p.texto || p.pregunta || p.title || "";
-    const coincideTexto = textoPregunta
-      .toLowerCase()
-      .includes(busqueda.toLowerCase());
+    const textoPregunta = p.pregunta || p.texto || "";
+    const coincideTexto = textoPregunta.toLowerCase().includes(busqueda.toLowerCase());
 
     if (!fechaFiltro) return coincideTexto;
 
-    const rawFecha = p.fecha || p.createdAt || p.created_at || p.fecha_creacion || p.date;
+    // Formateamos la fecha registrada en la pregunta
+    const rawFecha = p.fecha || p.createdAt || p.created_at;
     let fechaItem = "";
 
     if (rawFecha) {
       if (typeof rawFecha === "string" && rawFecha.includes("-")) {
         fechaItem = rawFecha.split("T")[0];
-      } else if (typeof rawFecha === "string" && rawFecha.includes("/")) {
-        const partes = rawFecha.split("/");
-        if (partes.length === 3) {
-          fechaItem = `${partes[2]}-${partes[1].padStart(2, "0")}-${partes[0].padStart(2, "0")}`;
-        }
       } else {
         try {
           fechaItem = new Date(rawFecha).toISOString().split("T")[0];
@@ -112,100 +52,80 @@ export default function FaqPage() {
       }
     }
 
-    if (!fechaItem) {
-      fechaItem = new Date().toISOString().split("T")[0];
-    }
-
     return coincideTexto && fechaItem === fechaFiltro;
   });
 
   return (
-    <main className="max-w-3xl mx-auto space-y-6 py-2">
-      
-      {/* Botón Volver y Encabezado */}
-      <div className="space-y-3 border-b border-white/10 pb-6">
-        
-
-        <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-sky-400">
-            CENTRO DE CONSULTAS QA
-          </span>
-          <h1 className="text-2xl font-bold text-white mt-0.5">
-            Preguntas Frecuentes y Soporte Senior
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Realiza preguntas al equipo Senior o filtra el historial de dudas resueltas.
-          </p>
-        </div>
+    <div className="mx-auto max-w-5xl space-y-6 text-xs text-slate-300">
+      {/* Cabecera */}
+      <div className="space-y-1">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded border border-sky-500/20">
+          CENTRO DE CONSULTAS QA
+        </span>
+        <h1 className="text-2xl font-bold text-white mt-1">Preguntas Frecuentes y Soporte Senior</h1>
+        <p className="text-slate-400">
+          Realiza preguntas al equipo Senior o filtra el historial de dudas resueltas por fecha.
+        </p>
       </div>
 
-      {/* Tarjeta para Crear Nueva Pregunta */}
-      <section className="rounded-2xl border border-sky-500/30 bg-gradient-to-b from-sky-500/[0.08] to-white/[0.02] p-6 shadow-2xl space-y-4">
-        <div className="flex items-center gap-2 text-white font-semibold text-sm">
-          <span>💬</span>
-          <h2>Realizar una nueva consulta</h2>
+      {/* Formulario de Nueva Consulta */}
+      <form onSubmit={handleEnviarConsulta} className="rounded-2xl border border-white/10 bg-[#07111f]/90 p-6 space-y-4 shadow-xl">
+        <h2 className="text-sm font-bold text-white flex items-center gap-2">
+          <span>💬</span> Realizar una nueva consulta
+        </h2>
+
+        <textarea
+          rows={3}
+          placeholder="Escribe aquí tu duda técnica sobre automatización, pruebas, casos de prueba..."
+          value={nuevaPregunta}
+          onChange={(e) => setNuevaPregunta(e.target.value)}
+          className="w-full rounded-xl border border-white/10 bg-[#0b192b] p-4 text-xs text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
+          required
+        />
+
+        {mensajeEnviado && (
+          <p className="text-emerald-400 font-semibold text-xs">
+            ✓ Pregunta guardada y enviada al QA Senior con la fecha actual registrada.
+          </p>
+        )}
+
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            className="rounded-xl bg-sky-500 px-5 py-2.5 font-bold text-white hover:bg-sky-400 transition-all shadow-lg shadow-sky-500/20"
+          >
+            Añadir pregunta →
+          </button>
         </div>
+      </form>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <textarea
-            id="pregunta"
-            value={pregunta}
-            onChange={(e) => setPregunta(e.target.value)}
-            required
-            rows={3}
-            placeholder="Escribe aquí tu duda técnica sobre automatización, pruebas, casos de prueba..."
-            className="w-full rounded-xl border border-white/15 bg-[#050b14] p-3.5 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
-          />
-
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex-1">
-              {error && <p className="text-xs text-rose-400 font-medium">⚠️ {error}</p>}
-              {mensaje && <p className="text-xs text-emerald-400 font-medium">✓ {mensaje}</p>}
-            </div>
-
-            <button
-              type="submit"
-              disabled={enviando}
-              className="rounded-xl bg-sky-400 px-6 py-2.5 text-xs font-bold text-slate-950 transition-all hover:bg-sky-300 disabled:opacity-50 shadow-md flex items-center gap-2"
-            >
-              <span>{enviando ? "Enviando..." : "Añadir pregunta"}</span>
-              <span>→</span>
-            </button>
-          </div>
-        </form>
-      </section>
-
-      {/* BARRA DE BÚSQUEDA Y FILTROS */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
-        <div className="sm:col-span-2 relative">
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-            Buscar en preguntas
-          </label>
+      {/* Filtros */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+        <div className="space-y-1">
+          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">BUSCAR EN PREGUNTAS</label>
           <input
             type="text"
             placeholder="Filtrar por palabras clave..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            className="w-full rounded-xl border border-white/10 bg-[#07111f]/90 px-4 py-3 text-xs text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none shadow-lg"
+            className="w-full rounded-xl border border-white/10 bg-[#07111f] px-4 py-2.5 text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
           />
         </div>
 
-        <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-            Filtrar por fecha
-          </label>
-          <div className="flex gap-1.5">
+        <div className="space-y-1">
+          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">FILTRAR POR FECHA</label>
+          <div className="flex gap-2">
             <input
               type="date"
               value={fechaFiltro}
               onChange={(e) => setFechaFiltro(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-[#07111f]/90 px-3 py-3 text-xs text-white focus:border-sky-400 focus:outline-none shadow-lg [color-scheme:dark]"
+              className="w-full rounded-xl border border-white/10 bg-[#07111f] px-4 py-2.5 text-white focus:border-sky-400 focus:outline-none"
             />
             {fechaFiltro && (
               <button
                 type="button"
                 onClick={() => setFechaFiltro("")}
-                className="rounded-xl bg-slate-800 px-3 text-xs text-slate-300 hover:bg-slate-700"
+                className="rounded-xl bg-white/5 px-3 py-2 text-slate-400 hover:text-white border border-white/10"
               >
                 ✕
               </button>
@@ -214,15 +134,8 @@ export default function FaqPage() {
         </div>
       </div>
 
-      {/* LISTA DE RESPUESTAS */}
-      {cargando ? (
-        <div className="p-12 text-center text-xs text-slate-400">
-          Cargando preguntas y respuestas...
-        </div>
-      ) : (
-        <Respuestas preguntas={preguntasFiltradas} />
-      )}
-
-    </main>
+      {/* Lista de Preguntas */}
+      <Respuestas preguntas={preguntasFiltradas} />
+    </div>
   );
 }

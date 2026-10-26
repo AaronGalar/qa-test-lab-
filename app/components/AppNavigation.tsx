@@ -17,6 +17,7 @@ const navigationItems = [
   },
   { href: "/tareas", label: "Lista de tareas",icon : "5" },
   { href: "/faq", label: "Preguntas frecuentes",icon : "6"  },
+  { href: "/blog", label: "Blog",icon : "6"  },
   { href: "/proyectos",  label: "Proyectos",icon : "7" },
  
   { href: "/ai-testing", label: "Testing de IAs & Chats",icon : "8" },
