@@ -13,30 +13,32 @@ export default function FAQPage() {
   const [mensajeEnviado, setMensajeEnviado] = useState(false);
 
   useEffect(() => {
-    setPreguntas(obtenerPreguntas());
+    obtenerPreguntas().then((data) => setPreguntas(data));
   }, []);
 
-  const handleEnviarConsulta = (e: React.FormEvent) => {
+  const handleEnviarConsulta = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nuevaPregunta.trim()) return;
 
-    // Guardamos la pregunta fijando la fecha de creación real
-    const actualizadas = guardarNuevaPregunta(nuevaPregunta);
-    setPreguntas(actualizadas);
-    setNuevaPregunta("");
-    
-    setMensajeEnviado(true);
-    setTimeout(() => setMensajeEnviado(false), 3000);
+    try {
+      await guardarNuevaPregunta(nuevaPregunta);
+      const actualizadas = await obtenerPreguntas();
+      setPreguntas(actualizadas);
+      setNuevaPregunta("");
+      
+      setMensajeEnviado(true);
+      setTimeout(() => setMensajeEnviado(false), 3000);
+    } catch (error) {
+      console.error("No se pudo enviar la consulta");
+    }
   };
 
-  // Filtrado preciso respetando la fecha asignada
   const preguntasFiltradas = preguntas.filter((p: any) => {
-    const textoPregunta = p.pregunta || p.texto || "";
+    const textoPregunta = p.texto || p.pregunta || "";
     const coincideTexto = textoPregunta.toLowerCase().includes(busqueda.toLowerCase());
 
     if (!fechaFiltro) return coincideTexto;
 
-    // Formateamos la fecha registrada en la pregunta
     const rawFecha = p.fecha || p.createdAt || p.created_at;
     let fechaItem = "";
 
@@ -57,7 +59,6 @@ export default function FAQPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 text-xs text-slate-300">
-      {/* Cabecera */}
       <div className="space-y-1">
         <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded border border-sky-500/20">
           CENTRO DE CONSULTAS QA
@@ -68,7 +69,6 @@ export default function FAQPage() {
         </p>
       </div>
 
-      {/* Formulario de Nueva Consulta */}
       <form onSubmit={handleEnviarConsulta} className="rounded-2xl border border-white/10 bg-[#07111f]/90 p-6 space-y-4 shadow-xl">
         <h2 className="text-sm font-bold text-white flex items-center gap-2">
           <span>💬</span> Realizar una nueva consulta
@@ -85,7 +85,7 @@ export default function FAQPage() {
 
         {mensajeEnviado && (
           <p className="text-emerald-400 font-semibold text-xs">
-            ✓ Pregunta guardada y enviada al QA Senior con la fecha actual registrada.
+            ✓ Pregunta guardada y enviada al servidor correctamente.
           </p>
         )}
 
@@ -99,7 +99,6 @@ export default function FAQPage() {
         </div>
       </form>
 
-      {/* Filtros */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
         <div className="space-y-1">
           <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">BUSCAR EN PREGUNTAS</label>
@@ -134,7 +133,6 @@ export default function FAQPage() {
         </div>
       </div>
 
-      {/* Lista de Preguntas */}
       <Respuestas preguntas={preguntasFiltradas} />
     </div>
   );

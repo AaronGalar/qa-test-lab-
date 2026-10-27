@@ -1,37 +1,54 @@
 // lib/api/preguntas.ts
 export interface Pregunta {
-  id: string;
-  pregunta: string;
+  id: number;
+  texto: string;
   respuesta?: string;
   estado: "Pendiente" | "Respondida";
-  fecha: string; // Formato YYYY-MM-DD
+  fecha?: string;
+  creado_por?: string;
   respondido_por?: string;
 }
 
-const STORAGE_KEY = "qa_saas_preguntas";
+const API_URL = "http://localhost:8000/api";
 
-export function obtenerPreguntas(): Pregunta[] {
+export async function obtenerPreguntas(): Promise<Pregunta[]> {
   if (typeof window === "undefined") return [];
-  const guardadas = localStorage.getItem(STORAGE_KEY);
-  return guardadas ? JSON.parse(guardadas) : [];
+  
+  const token = localStorage.getItem("token") || localStorage.getItem("access_token");
+
+  try {
+    const res = await fetch(`${API_URL}/preguntas`, {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (error) {
+    console.error("Error al obtener preguntas del servidor:", error);
+    return [];
+  }
 }
 
-export function guardarNuevaPregunta(textoPregunta: string, fechaPersonalizada?: string): Pregunta[] {
-  const actuales = obtenerPreguntas();
-  
-  // Usamos la fecha indicada o, por defecto, el día actual en formato YYYY-MM-DD
-  const fechaFinal = fechaPersonalizada || new Date().toISOString().split("T")[0];
+export async function guardarNuevaPregunta(textoPregunta: string): Promise<any> {
+  if (typeof window === "undefined") return null;
 
-  const nueva: Pregunta = {
-    id: Date.now().toString(),
-    pregunta: textoPregunta,
-    estado: "Pendiente",
-    fecha: fechaFinal,
-  };
+  const token = localStorage.getItem("token") || localStorage.getItem("access_token");
 
-  const actualizadas = [nueva, ...actuales];
-  if (typeof window !== "undefined") {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(actualizadas));
+  try {
+    const res = await fetch(`${API_URL}/preguntas`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ texto: textoPregunta }),
+    });
+
+    if (!res.ok) throw new Error("Error al enviar la pregunta al servidor");
+    return await res.json();
+  } catch (error) {
+    console.error("Error al guardar la nueva pregunta:", error);
+    throw error;
   }
-  return actualizadas;
 }
