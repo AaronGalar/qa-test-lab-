@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation"; // 👈 Hook para obtener la ruta actual
 import { useEffect, useState } from "react";
-
+import LogoutButton from "@/app/components/LogoutButton";
 const navigationItems = [
   { href: "/resumen", label: "Resumen",icon : "1"  },
    { href: "/fuentes", label: "Fuentes y Tutoriales",icon : "2" },
@@ -45,7 +45,7 @@ export default function AppNavigation() {
         <span className="px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 block mb-3 mt-2">
           Menú de Navegación
         </span>
-
+   
         <nav aria-label="Navegación principal" className="space-y-2">
           {navigationItems.map((item) => {
             // Comprueba si la ruta actual coincide exactamente con el enlace
@@ -89,6 +89,7 @@ export default function AppNavigation() {
               </Link>
             );
           })}
+          <LogoutButton />
 
           {/* BOTÓN DE ADMIN CONDICIONAL */}
           {isClient && esAdmin && (
